@@ -41,6 +41,10 @@ include(${CMAKE_SOURCE_DIR}/cmake/Modules/misc.cmake)
 # This is done here so that relative search paths are more reasnable
 find_package(Irrlicht)
 
+# Sound library
+find_package(OpenAL)
+find_package(ALUT)
+
 #
 # Installation
 #

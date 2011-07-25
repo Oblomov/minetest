@@ -19,6 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "common_irrlicht.h"
 #include "game.h"
+#include "audio.h"
 #include "client.h"
 #include "server.h"
 #include "guiPauseMenu.h"
@@ -768,7 +769,28 @@ void the_game(
 	std::wstring &error_message,
     std::string configpath
 )
-{
+{	
+	// Initalize Audio
+	std::cout << "Audio not initalized so we do it now" << std::endl;
+	Audio * audio = new Audio();
+	audio->initalize();
+	
+	// <Test sounds>
+	/*audio->registerSoundSource(new HelloWorldAudioSource());
+	audio->registerSoundSource(new HelloWorldAudioSource2());*/
+	// </Test sounds>
+	FootstepAudioSource * footstepAudio;
+	JumpAudioSource * jumpAudio;
+
+	
+	audio->registerSoundSource(footstepAudio = new FootstepAudioSource());
+	audio->registerSoundSource(jumpAudio = new JumpAudioSource());
+	
+	audio->setAmbientSound("data/sounds/ambient.ogg");
+	audio->setAmbientSound("data/sounds/music.ogg");
+	
+	
+	
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 	
@@ -932,6 +954,9 @@ void the_game(
 		error_message = L"Failed to create the camera node";
 		return;
 	}
+
+	// Tell the audio subsystem the camera
+	audio->setPlayerCamera(camera);
 
 	camera->setFOV(FOV_ANGLE);
 
@@ -1485,6 +1510,15 @@ void the_game(
 				camera_yaw
 			);
 			client.setPlayerControl(control);
+			
+			// Define a sound for each action
+			footstepAudio->active = input->isKeyDown(
+                getKeySetting("keymap_forward")) || input->isKeyDown(
+                getKeySetting("keymap_backward")) || input->isKeyDown(
+                getKeySetting("keymap_left")) || input->isKeyDown(
+                getKeySetting("keymap_right"));
+			jumpAudio->active = input->isKeyDown(
+                getKeySetting("keymap_jump"));
 		}
 		
 		/*
@@ -1531,6 +1565,13 @@ void the_game(
 		// Get player position
 		v3f camera_position;
 		v3f player_position = client.getPlayerPosition(&camera_position);
+
+		// We update the position
+		// TODO: we now just need to optain the velocity
+		audio->updatePlayerPostion(player_position);
+
+		// Now we need to update the orientation
+		audio->updateOrientation();
 
 		//TimeTaker //timer2("//timer2");
 
@@ -2227,6 +2268,15 @@ void the_game(
 		}
 
 		/*
+		 * Sound begins
+		 */
+		//TODO: we need to register Objects ad Audio
+		// Where do we get the active objects in our area?
+
+		audio->processSound();		
+
+	
+		/*
 			Drawing begins
 		*/
 
@@ -2392,6 +2442,7 @@ void the_game(
 		guienv->drawAll();
 		driver->endScene();
 		gui_shuttingdowntext->remove();*/
+		alutExit();
 	}
 }
 

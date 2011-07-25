@@ -138,6 +138,7 @@ endif()
 # Client sources
 set(minetest_SRCS
 	${common_SRCS}
+	audio.cpp
 	content_cao.cpp
 	mapblock_mesh.cpp
 	farmesh.cpp
@@ -166,6 +167,9 @@ set(minetestserver_SRCS
 include_directories(
 	${PROJECT_BINARY_DIR}
 	${IRRLICHT_INCLUDE_DIR}
+	${OPENAL_INCLUDE_DIR}
+	${ALUT_INCLUDE_DIR}
+	${VORBIS_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIR}
 	${CMAKE_BUILD_TYPE}
 	${PNG_INCLUDE_DIR}
@@ -183,6 +187,9 @@ if(BUILD_CLIENT)
 		${ZLIB_LIBRARIES}
 		${IRRLICHT_LIBRARY}
 		${OPENGL_LIBRARIES}
+		${OPENAL_LIBRARIES}
+		${ALUT_LIBRARY}
+		${VORBIS_LIBRARIES}
 		${JPEG_LIBRARIES}
 		${BZIP2_LIBRARIES}
 		${PNG_LIBRARIES}
@@ -233,9 +240,9 @@ else()
 	# Probably GCC
 	
 	if(WARN_ALL)
-		set(RELEASE_WARNING_FLAGS "-Wall")
+		set(RELEASE_WARNING_FLAGS "-Wall -lalut -lvorbisfile")
 	else()
-		set(RELEASE_WARNING_FLAGS "")
+		set(RELEASE_WARNING_FLAGS " -lalut -lvorbisfile")
 	endif()
 	
 	if(NOT APPLE AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -250,8 +257,8 @@ else()
 		set(ARCH i386)
 	endif()
 
-	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${RELEASE_WARNING_FLAGS} ${WARNING_FLAGS} -O3 -ffast-math -Wall -fomit-frame-pointer -pipe -funroll-loops")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -O1 -Wall ${WARNING_FLAGS}")
+	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${RELEASE_WARNING_FLAGS} ${WARNING_FLAGS} -O3 -ffast-math -Wall -fomit-frame-pointer -pipe -funroll-loops -lalut -lvorbisfile")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -O1 -Wall ${WARNING_FLAGS} -lalut -lvorbisfile")
 
 	if(USE_GPROF)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg")
