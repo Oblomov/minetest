@@ -3902,7 +3902,7 @@ MapVoxelManipulator::~MapVoxelManipulator()
 			<<std::endl;*/
 }
 
-void MapVoxelManipulator::emerge(VoxelArea a, s32 caller_id)
+void MapVoxelManipulator::emerge(const VoxelArea &a, s32 caller_id)
 {
 	TimeTaker timer1("emerge", &emerge_time);
 
@@ -4046,7 +4046,7 @@ ManualMapVoxelManipulator::~ManualMapVoxelManipulator()
 {
 }
 
-void ManualMapVoxelManipulator::emerge(VoxelArea a, s32 caller_id)
+void ManualMapVoxelManipulator::emerge(const VoxelArea &a, s32 caller_id)
 {
 	// Just create the area so that it can be pointed to
 	VoxelManipulator::emerge(a, caller_id);

@@ -63,7 +63,7 @@ void VoxelManipulator::clear()
 	m_flags = NULL;
 }
 
-void VoxelManipulator::print(std::ostream &o, VoxelPrintMode mode)
+void VoxelManipulator::print(std::ostream &o, VoxelPrintMode mode) const
 {
 	v3s16 em = m_area.getExtent();
 	v3s16 of = m_area.MinEdge;
@@ -126,7 +126,7 @@ void VoxelManipulator::print(std::ostream &o, VoxelPrintMode mode)
 	}
 }
 
-void VoxelManipulator::addArea(VoxelArea area)
+void VoxelManipulator::addArea(const VoxelArea &area)
 {
 	// Cancel if requested area has zero volume
 	if(area.getExtent() == v3s16(0,0,0))
@@ -206,8 +206,8 @@ void VoxelManipulator::addArea(VoxelArea area)
 	//dstream<<"addArea done"<<std::endl;
 }
 
-void VoxelManipulator::copyFrom(MapNode *src, VoxelArea src_area,
-		v3s16 from_pos, v3s16 to_pos, v3s16 size)
+void VoxelManipulator::copyFrom(const MapNode *src, const VoxelArea &src_area,
+		const v3s16 &from_pos, const v3s16 &to_pos, const v3s16 &size)
 {
 	for(s16 z=0; z<size.Z; z++)
 	for(s16 y=0; y<size.Y; y++)
@@ -219,8 +219,8 @@ void VoxelManipulator::copyFrom(MapNode *src, VoxelArea src_area,
 	}
 }
 
-void VoxelManipulator::copyTo(MapNode *dst, VoxelArea dst_area,
-		v3s16 dst_pos, v3s16 from_pos, v3s16 size)
+void VoxelManipulator::copyTo(MapNode *dst, const VoxelArea &dst_area,
+		const v3s16 &dst_pos, const v3s16 &from_pos, const v3s16 &size) const
 {
 	for(s16 z=0; z<size.Z; z++)
 	for(s16 y=0; y<size.Y; y++)
@@ -278,8 +278,8 @@ void VoxelManipulator::clearFlag(u8 flags)
 			<<volume<<" nodes"<<std::endl;*/
 }
 
-void VoxelManipulator::unspreadLight(enum LightBank bank, v3s16 p, u8 oldlight,
-		core::map<v3s16, bool> & light_sources)
+void VoxelManipulator::unspreadLight(enum LightBank bank, const v3s16 &p,
+		u8 oldlight, core::map<v3s16, bool> & light_sources)
 {
 	v3s16 dirs[6] = {
 		v3s16(0,0,1), // back
@@ -491,7 +491,7 @@ void VoxelManipulator::unspreadLight(enum LightBank bank,
 }
 #endif
 
-void VoxelManipulator::spreadLight(enum LightBank bank, v3s16 p)
+void VoxelManipulator::spreadLight(enum LightBank bank, const v3s16 &p)
 {
 	const v3s16 dirs[6] = {
 		v3s16(0,0,1), // back

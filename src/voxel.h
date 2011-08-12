@@ -58,12 +58,12 @@ public:
 		MaxEdge(0,0,0)
 	{
 	}
-	VoxelArea(v3s16 min_edge, v3s16 max_edge):
+	VoxelArea(const v3s16 &min_edge, const v3s16 &max_edge):
 		MinEdge(min_edge),
 		MaxEdge(max_edge)
 	{
 	}
-	VoxelArea(v3s16 p):
+	VoxelArea(const v3s16 &p):
 		MinEdge(p),
 		MaxEdge(p)
 	{
@@ -73,7 +73,7 @@ public:
 		Modifying methods
 	*/
 
-	void addArea(VoxelArea &a)
+	void addArea(const VoxelArea &a)
 	{
 		if(getExtent() == v3s16(0,0,0))
 		{
@@ -87,7 +87,7 @@ public:
 		if(a.MaxEdge.Y > MaxEdge.Y) MaxEdge.Y = a.MaxEdge.Y;
 		if(a.MaxEdge.Z > MaxEdge.Z) MaxEdge.Z = a.MaxEdge.Z;
 	}
-	void addPoint(v3s16 p)
+	void addPoint(const v3s16 &p)
 	{
 		if(getExtent() == v3s16(0,0,0))
 		{
@@ -104,7 +104,7 @@ public:
 	}
 	
 	// Pad with d nodes
-	void pad(v3s16 d)
+	void pad(const v3s16 &d)
 	{
 		MinEdge -= d;
 		MaxEdge += d;
@@ -148,7 +148,7 @@ public:
 			a.MinEdge.Z >= MinEdge.Z && a.MaxEdge.Z <= MaxEdge.Z
 		);
 	}
-	bool contains(v3s16 p) const
+	bool contains(const v3s16 &p) const
 	{
 		return(
 			p.X >= MinEdge.X && p.X <= MaxEdge.X &&
@@ -166,12 +166,12 @@ public:
 				&& MaxEdge == other.MaxEdge);
 	}
 
-	VoxelArea operator+(v3s16 off) const
+	VoxelArea operator+(const v3s16 &off) const
 	{
 		return VoxelArea(MinEdge+off, MaxEdge+off);
 	}
 
-	VoxelArea operator-(v3s16 off) const
+	VoxelArea operator-(const v3s16 &off) const
 	{
 		return VoxelArea(MinEdge-off, MaxEdge-off);
 	}
@@ -266,28 +266,28 @@ public:
 		//dstream<<" i("<<x<<","<<y<<","<<z<<")="<<i<<" ";
 		return i;
 	}
-	s32 index(v3s16 p) const
+	s32 index(const v3s16 &p) const
 	{
 		return index(p.X, p.Y, p.Z);
 	}
 	
 	// Translate index in the X coordinate
-	void add_x(const v3s16 &extent, u32 &i, s16 a)
+	void add_x(const v3s16 &extent, u32 &i, s16 a) const
 	{
 		i += a;
 	}
 	// Translate index in the Y coordinate
-	void add_y(const v3s16 &extent, u32 &i, s16 a)
+	void add_y(const v3s16 &extent, u32 &i, s16 a) const
 	{
 		i += a * extent.X;
 	}
 	// Translate index in the Z coordinate
-	void add_z(const v3s16 &extent, u32 &i, s16 a)
+	void add_z(const v3s16 &extent, u32 &i, s16 a) const
 	{
 		i += a * extent.X*extent.Y;
 	}
 	// Translate index in space
-	void add_p(const v3s16 &extent, u32 &i, v3s16 a)
+	void add_p(const v3s16 &extent, u32 &i, v3s16 a) const
 	{
 		i += a.Z*extent.X*extent.Y + a.Y*extent.X + a.X;
 	}
@@ -356,7 +356,7 @@ public:
 		These are a bit slow and shouldn't be used internally.
 		Use m_data[m_area.index(p)] instead.
 	*/
-	MapNode getNode(v3s16 p)
+	MapNode getNode(const v3s16 &p)
 	{
 		emerge(p);
 
@@ -373,7 +373,7 @@ public:
 
 		return m_data[m_area.index(p)];
 	}
-	MapNode getNodeNoEx(v3s16 p)
+	MapNode getNodeNoEx(const v3s16 &p)
 	{
 		emerge(p);
 
@@ -384,7 +384,7 @@ public:
 
 		return m_data[m_area.index(p)];
 	}
-	MapNode getNodeNoExNoEmerge(v3s16 p)
+	MapNode getNodeNoExNoEmerge(const v3s16 &p)
 	{
 		if(m_area.contains(p) == false)
 			return MapNode(CONTENT_IGNORE);
@@ -392,7 +392,7 @@ public:
 			return MapNode(CONTENT_IGNORE);
 		return m_data[m_area.index(p)];
 	}
-	MapNode & getNodeRef(v3s16 p)
+	MapNode & getNodeRef(const v3s16 &p)
 	{
 		emerge(p);
 
@@ -409,7 +409,7 @@ public:
 
 		return m_data[m_area.index(p)];
 	}
-	void setNode(v3s16 p, MapNode &n)
+	void setNode(const v3s16 &p, const MapNode &n)
 	{
 		emerge(p);
 		
@@ -417,7 +417,8 @@ public:
 		m_flags[m_area.index(p)] &= ~VOXELFLAG_INEXISTENT;
 		m_flags[m_area.index(p)] &= ~VOXELFLAG_NOT_LOADED;
 	}
-	void setNodeNoRef(v3s16 p, MapNode n)
+	/* this is superfluous */
+	void setNodeNoRef(const v3s16 &p, const MapNode &n)
 	{
 		setNode(p, n);
 	}
@@ -448,14 +449,14 @@ public:
 		This is convenient but slower than playing around directly
 		with the m_data table with indices.
 	*/
-	bool setNodeNoEmerge(v3s16 p, MapNode n)
+	bool setNodeNoEmerge(const v3s16 &p, const MapNode &n)
 	{
 		if(m_area.contains(p) == false)
 			return false;
 		m_data[m_area.index(p)] = n;
 		return true;
 	}
-	bool setNodeNoEmerge(s32 i, MapNode n)
+	bool setNodeNoEmerge(s32 i, const MapNode &n)
 	{
 		if(m_area.contains(i) == false)
 			return false;
@@ -475,20 +476,22 @@ public:
 
 	virtual void clear();
 
-	void print(std::ostream &o, VoxelPrintMode mode=VOXELPRINT_MATERIAL);
+	void print(std::ostream &o, VoxelPrintMode mode=VOXELPRINT_MATERIAL) const;
 	
-	void addArea(VoxelArea area);
+	void addArea(const VoxelArea &area);
 
 	/*
 		Copy data and set flags to 0
 		dst_area.getExtent() <= src_area.getExtent()
 	*/
-	void copyFrom(MapNode *src, VoxelArea src_area,
-			v3s16 from_pos, v3s16 to_pos, v3s16 size);
+	void copyFrom(const MapNode *src, const VoxelArea &src_area,
+			const v3s16 &from_pos, const v3s16 &to_pos,
+			const v3s16 &size);
 	
 	// Copy data
-	void copyTo(MapNode *dst, VoxelArea dst_area,
-			v3s16 dst_pos, v3s16 from_pos, v3s16 size);
+	void copyTo(MapNode *dst, const VoxelArea &dst_area,
+			const v3s16 &dst_pos, const v3s16 &from_pos,
+			const v3s16 &size) const;
 
 	/*
 		Algorithms
@@ -496,13 +499,13 @@ public:
 
 	void clearFlag(u8 flag);
 	
-	void unspreadLight(enum LightBank bank, v3s16 p, u8 oldlight,
+	void unspreadLight(enum LightBank bank, const v3s16 &p, u8 oldlight,
 			core::map<v3s16, bool> & light_sources);
 	void unspreadLight(enum LightBank bank,
 			core::map<v3s16, u8> & from_nodes,
 			core::map<v3s16, bool> & light_sources);
 	
-	void spreadLight(enum LightBank bank, v3s16 p);
+	void spreadLight(enum LightBank bank, const v3s16 &p);
 	void spreadLight(enum LightBank bank,
 			core::map<v3s16, bool> & from_nodes);
 	
@@ -517,7 +520,7 @@ public:
 
 		If not found from source, add with VOXELFLAG_INEXISTENT
 	*/
-	virtual void emerge(VoxelArea a, s32 caller_id=-1)
+	virtual void emerge(const VoxelArea &a, s32 caller_id=-1)
 	{
 		//dstream<<"emerge p=("<<p.X<<","<<p.Y<<","<<p.Z<<")"<<std::endl;
 		addArea(a);

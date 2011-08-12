@@ -585,7 +585,7 @@ public:
 		m_loaded_blocks.clear();
 	}
 
-	virtual void emerge(VoxelArea a, s32 caller_id=-1);
+	virtual void emerge(const VoxelArea &a, s32 caller_id=-1);
 
 	void blitBack(core::map<v3s16, MapBlock*> & modified_blocks);
 
@@ -607,7 +607,7 @@ public:
 	void setMap(Map *map)
 	{m_map = map;}
 	
-	virtual void emerge(VoxelArea a, s32 caller_id=-1);
+	virtual void emerge(const VoxelArea &a, s32 caller_id=-1);
 
 	void initialEmerge(v3s16 blockpos_min, v3s16 blockpos_max);
 	
