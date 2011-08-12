@@ -573,11 +573,11 @@ public:
 		- "nodemeta:X,Y,Z"
 	*/
 	virtual Inventory* getInventory(InventoryContext *c,
-			std::string id)
+			const std::string &id)
 		{return NULL;}
 	// Used on the server by InventoryAction::apply and other stuff
 	virtual void inventoryModified(InventoryContext *c,
-			std::string id)
+			const std::string &id)
 		{}
 	// Used on the client
 	virtual void inventoryAction(InventoryAction *a)

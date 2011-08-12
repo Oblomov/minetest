@@ -2051,7 +2051,7 @@ InventoryContext *Client::getInventoryContext()
 	return &m_inventory_context;
 }
 
-Inventory* Client::getInventory(InventoryContext *c, std::string id)
+Inventory* Client::getInventory(InventoryContext *c, const std::string &id)
 {
 	if(id == "current_player")
 	{

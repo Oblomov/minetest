@@ -222,7 +222,7 @@ public:
 	
 	InventoryContext *getInventoryContext();
 
-	Inventory* getInventory(InventoryContext *c, std::string id);
+	Inventory* getInventory(InventoryContext *c, const std::string &id);
 	void inventoryAction(InventoryAction *a);
 
 	// Gets closest object pointed by the shootline

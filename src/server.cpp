@@ -3457,7 +3457,7 @@ void Server::onMapEditEvent(MapEditEvent *event)
 	m_unsent_map_edit_queue.push_back(e);
 }
 
-Inventory* Server::getInventory(InventoryContext *c, std::string id)
+Inventory* Server::getInventory(InventoryContext *c, const std::string &id)
 {
 	if(id == "current_player")
 	{
@@ -3485,7 +3485,7 @@ Inventory* Server::getInventory(InventoryContext *c, std::string id)
 	dstream<<__FUNCTION_NAME<<": unknown id "<<id<<std::endl;
 	return NULL;
 }
-void Server::inventoryModified(InventoryContext *c, std::string id)
+void Server::inventoryModified(InventoryContext *c, const std::string &id)
 {
 	if(id == "current_player")
 	{
