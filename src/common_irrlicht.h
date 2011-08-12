@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define endSceneX(d){d->draw2DLine(v2s32(0,0),v2s32(1,0),\
 video::SColor(255,30,30,30));d->endScene();}
 
+#include "customIrrMap.h"
 #include <irrlicht.h>
 using namespace irr;
 typedef core::vector3df v3f;
