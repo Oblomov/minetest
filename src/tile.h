@@ -71,7 +71,7 @@ struct AtlasPointer
 	{
 	}
 
-	bool operator==(const AtlasPointer &other)
+	bool operator==(const AtlasPointer &other) const
 	{
 		return (
 			id == other.id
@@ -85,10 +85,10 @@ struct AtlasPointer
 		);*/
 	}
 
-	float x0(){ return pos.X; }
-	float x1(){ return pos.X + size.X; }
-	float y0(){ return pos.Y; }
-	float y1(){ return pos.Y + size.Y; }
+	float x0() const { return pos.X; }
+	float x1() const { return pos.X + size.X; }
+	float y0() const { return pos.Y; }
+	float y1() const { return pos.Y + size.Y; }
 };
 
 /*
