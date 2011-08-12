@@ -35,7 +35,7 @@ namespace mapgen
 */
 
 #if 0
-static s16 find_ground_level(VoxelManipulator &vmanip, v2s16 p2d)
+static s16 find_ground_level(VoxelManipulator &vmanip, const v2s16 &p2d)
 {
 	v3s16 em = vmanip.m_area.getExtent();
 	s16 y_nodes_max = vmanip.m_area.MaxEdge.Y;
@@ -56,7 +56,7 @@ static s16 find_ground_level(VoxelManipulator &vmanip, v2s16 p2d)
 		return y_nodes_min;
 }
 
-static s16 find_ground_level_clever(VoxelManipulator &vmanip, v2s16 p2d)
+static s16 find_ground_level_clever(VoxelManipulator &vmanip, const v2s16 &p2d)
 {
 	v3s16 em = vmanip.m_area.getExtent();
 	s16 y_nodes_max = vmanip.m_area.MaxEdge.Y;
@@ -80,7 +80,7 @@ static s16 find_ground_level_clever(VoxelManipulator &vmanip, v2s16 p2d)
 }
 #endif
 
-static void make_tree(VoxelManipulator &vmanip, v3s16 p0)
+static void make_tree(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode treenode(CONTENT_TREE);
 	MapNode leavesnode(CONTENT_LEAVES);
@@ -152,7 +152,7 @@ static void make_tree(VoxelManipulator &vmanip, v3s16 p0)
 	}
 }
 
-static void make_jungletree(VoxelManipulator &vmanip, v3s16 p0)
+static void make_jungletree(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode treenode(CONTENT_JUNGLETREE);
 	MapNode leavesnode(CONTENT_LEAVES);
@@ -238,7 +238,7 @@ static void make_jungletree(VoxelManipulator &vmanip, v3s16 p0)
 	}
 }
 
-void make_papyrus(VoxelManipulator &vmanip, v3s16 p0)
+void make_papyrus(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode papyrusnode(CONTENT_PAPYRUS);
 
@@ -252,7 +252,7 @@ void make_papyrus(VoxelManipulator &vmanip, v3s16 p0)
 	}
 }
 
-void make_cactus(VoxelManipulator &vmanip, v3s16 p0)
+void make_cactus(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode cactusnode(CONTENT_CACTUS);
 
@@ -267,7 +267,7 @@ void make_cactus(VoxelManipulator &vmanip, v3s16 p0)
 }
 
 #if 0
-static void make_randomstone(VoxelManipulator &vmanip, v3s16 p0)
+static void make_randomstone(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode stonenode(CONTENT_STONE);
 
@@ -348,7 +348,7 @@ static void make_randomstone(VoxelManipulator &vmanip, v3s16 p0)
 #endif
 
 #if 0
-static void make_largestone(VoxelManipulator &vmanip, v3s16 p0)
+static void make_largestone(VoxelManipulator &vmanip, const v3s16 &p0)
 {
 	MapNode stonenode(CONTENT_STONE);
 
@@ -440,7 +440,8 @@ static void make_largestone(VoxelManipulator &vmanip, v3s16 p0)
 #define VMANIP_FLAG_DUNGEON_UNTOUCHABLE (\
 		VMANIP_FLAG_DUNGEON_INSIDE|VMANIP_FLAG_DUNGEON_PRESERVE)
 
-static void make_room1(VoxelManipulator &vmanip, v3s16 roomsize, v3s16 roomplace)
+static void make_room1(VoxelManipulator &vmanip,
+		const v3s16 &roomsize, const v3s16 &roomplace)
 {
 	// Make +-X walls
 	for(s16 z=0; z<roomsize.Z; z++)
@@ -528,8 +529,9 @@ static void make_room1(VoxelManipulator &vmanip, v3s16 roomsize, v3s16 roomplace
 	}
 }
 
-static void make_fill(VoxelManipulator &vmanip, v3s16 place, v3s16 size,
-		u8 avoid_flags, MapNode n, u8 or_flags)
+static void make_fill(VoxelManipulator &vmanip,
+		const v3s16 &place, const v3s16 &size,
+		u8 avoid_flags, const MapNode &n, u8 or_flags)
 {
 	for(s16 z=0; z<size.Z; z++)
 	for(s16 y=0; y<size.Y; y++)
@@ -546,13 +548,14 @@ static void make_fill(VoxelManipulator &vmanip, v3s16 place, v3s16 size,
 	}
 }
 
-static void make_hole1(VoxelManipulator &vmanip, v3s16 place)
+static void make_hole1(VoxelManipulator &vmanip, const v3s16 &place)
 {
 	make_fill(vmanip, place, v3s16(1,2,1), 0, MapNode(CONTENT_AIR),
 			VMANIP_FLAG_DUNGEON_INSIDE);
 }
 
-static void make_door1(VoxelManipulator &vmanip, v3s16 doorplace, v3s16 doordir)
+static void make_door1(VoxelManipulator &vmanip,
+		const v3s16 &doorplace, const v3s16 &doordir)
 {
 	make_hole1(vmanip, doorplace);
 	// Place torch (for testing)
@@ -567,7 +570,7 @@ static v3s16 rand_ortho_dir(PseudoRandom &random)
 		return random.next()%2 ? v3s16(0,0,-1) : v3s16(0,0,1);
 }
 
-static v3s16 turn_xz(v3s16 olddir, int t)
+static v3s16 turn_xz(const v3s16 &olddir, int t)
 {
 	v3s16 dir;
 	if(t == 0)
@@ -587,7 +590,7 @@ static v3s16 turn_xz(v3s16 olddir, int t)
 	return dir;
 }
 
-static v3s16 random_turn(PseudoRandom &random, v3s16 olddir)
+static v3s16 random_turn(PseudoRandom &random, const v3s16 &olddir)
 {
 	int turn = random.range(0,2);
 	v3s16 dir;
@@ -605,8 +608,8 @@ static v3s16 random_turn(PseudoRandom &random, v3s16 olddir)
 	return dir;
 }
 
-static void make_corridor(VoxelManipulator &vmanip, v3s16 doorplace,
-		v3s16 doordir, v3s16 &result_place, v3s16 &result_dir,
+static void make_corridor(VoxelManipulator &vmanip, const v3s16 &doorplace,
+		const v3s16 &doordir, v3s16 &result_place, v3s16 &result_dir,
 		PseudoRandom &random)
 {
 	make_hole1(vmanip, doorplace);
@@ -692,7 +695,7 @@ class RoomWalker
 {
 public:
 
-	RoomWalker(VoxelManipulator &vmanip_, v3s16 pos, PseudoRandom &random):
+	RoomWalker(VoxelManipulator &vmanip_, const v3s16 &pos, PseudoRandom &random):
 			vmanip(vmanip_),
 			m_pos(pos),
 			m_random(random)
@@ -705,12 +708,12 @@ public:
 		m_dir = rand_ortho_dir(m_random);
 	}
 
-	void setPos(v3s16 pos)
+	void setPos(const v3s16 &pos)
 	{
 		m_pos = pos;
 	}
 
-	void setDir(v3s16 dir)
+	void setDir(const v3s16 &dir)
 	{
 		m_dir = dir;
 	}
@@ -775,7 +778,7 @@ public:
 		return false;
 	}
 
-	bool findPlaceForRoomDoor(v3s16 roomsize, v3s16 &result_doorplace,
+	bool findPlaceForRoomDoor(const v3s16 &roomsize, v3s16 &result_doorplace,
 			v3s16 &result_doordir, v3s16 &result_roomplace)
 	{
 		for(s16 trycount=0; trycount<30; trycount++)
@@ -1073,7 +1076,7 @@ NoiseParams get_ground_wetness_params(u64 seed)
 			1.1, 40.0, 1.0);
 }
 
-bool is_cave(u64 seed, v3s16 p)
+bool is_cave(u64 seed, const v3s16 &p)
 {
 	double d1 = noise3d_param(get_cave_noise1_params(seed), p.X,p.Y,p.Z);
 	double d2 = noise3d_param(get_cave_noise2_params(seed), p.X,p.Y,p.Z);
@@ -1087,7 +1090,7 @@ bool is_cave(u64 seed, v3s16 p)
 	      and buffered
 		  NOTE: The speed of these actually isn't terrible
 */
-bool val_is_ground(double ground_noise1_val, v3s16 p, u64 seed)
+bool val_is_ground(double ground_noise1_val, const v3s16 &p, u64 seed)
 {
 	//return ((double)p.Y < ground_noise1_val);
 
@@ -1109,14 +1112,14 @@ bool val_is_ground(double ground_noise1_val, v3s16 p, u64 seed)
 /*
 	Queries whether a position is ground or not.
 */
-bool is_ground(u64 seed, v3s16 p)
+bool is_ground(u64 seed, const v3s16 &p)
 {
 	double val1 = noise3d_param(get_ground_noise1_params(seed), p.X,p.Y,p.Z);
 	return val_is_ground(val1, p, seed);
 }
 
 // Amount of trees per area in nodes
-double tree_amount_2d(u64 seed, v2s16 p)
+double tree_amount_2d(u64 seed, const v2s16 &p)
 {
 	/*double noise = noise2d_perlin(
 			0.5+(float)p.X/250, 0.5+(float)p.Y/250,
@@ -1131,7 +1134,7 @@ double tree_amount_2d(u64 seed, v2s16 p)
 		return 0.04 * (noise-zeroval) / (1.0-zeroval);
 }
 
-double surface_humidity_2d(u64 seed, v2s16 p)
+double surface_humidity_2d(u64 seed, const v2s16 &p)
 {
 	double noise = noise2d_perlin(
 			0.5+(float)p.X/500, 0.5+(float)p.Y/500,
@@ -1145,7 +1148,7 @@ double surface_humidity_2d(u64 seed, v2s16 p)
 }
 
 #if 0
-double randomstone_amount_2d(u64 seed, v2s16 p)
+double randomstone_amount_2d(u64 seed, const v2s16 &p)
 {
 	double noise = noise2d_perlin(
 			0.5+(float)p.X/250, 0.5+(float)p.Y/250,
@@ -1158,7 +1161,7 @@ double randomstone_amount_2d(u64 seed, v2s16 p)
 }
 #endif
 
-double largestone_amount_2d(u64 seed, v2s16 p)
+double largestone_amount_2d(u64 seed, const v2s16 &p)
 {
 	double noise = noise2d_perlin(
 			0.5+(float)p.X/250, 0.5+(float)p.Y/250,
@@ -1173,7 +1176,7 @@ double largestone_amount_2d(u64 seed, v2s16 p)
 /*
 	Incrementally find ground level from 3d noise
 */
-s16 find_ground_level_from_noise(u64 seed, v2s16 p2d, s16 precision)
+s16 find_ground_level_from_noise(u64 seed, const v2s16 &p2d, s16 precision)
 {
 	// Start a bit fuzzy to make averaging lower precision values
 	// more useful
@@ -1221,9 +1224,9 @@ s16 find_ground_level_from_noise(u64 seed, v2s16 p2d, s16 precision)
 	return level;
 }
 
-double get_sector_average_ground_level(u64 seed, v2s16 sectorpos, double p=4);
+double get_sector_average_ground_level(u64 seed, const v2s16 &sectorpos, double p=4);
 
-double get_sector_average_ground_level(u64 seed, v2s16 sectorpos, double p)
+double get_sector_average_ground_level(u64 seed, const v2s16 &sectorpos, double p)
 {
 	v2s16 node_min = sectorpos*MAP_BLOCKSIZE;
 	v2s16 node_max = (sectorpos+v2s16(1,1))*MAP_BLOCKSIZE-v2s16(1,1);
@@ -1242,9 +1245,9 @@ double get_sector_average_ground_level(u64 seed, v2s16 sectorpos, double p)
 	return a;
 }
 
-double get_sector_maximum_ground_level(u64 seed, v2s16 sectorpos, double p=4);
+double get_sector_maximum_ground_level(u64 seed, const v2s16 &sectorpos, double p=4);
 
-double get_sector_maximum_ground_level(u64 seed, v2s16 sectorpos, double p)
+double get_sector_maximum_ground_level(u64 seed, const v2s16 &sectorpos, double p)
 {
 	v2s16 node_min = sectorpos*MAP_BLOCKSIZE;
 	v2s16 node_max = (sectorpos+v2s16(1,1))*MAP_BLOCKSIZE-v2s16(1,1);
@@ -1273,9 +1276,9 @@ double get_sector_maximum_ground_level(u64 seed, v2s16 sectorpos, double p)
 	return a;
 }
 
-double get_sector_minimum_ground_level(u64 seed, v2s16 sectorpos, double p=4);
+double get_sector_minimum_ground_level(u64 seed, const v2s16 &sectorpos, double p=4);
 
-double get_sector_minimum_ground_level(u64 seed, v2s16 sectorpos, double p)
+double get_sector_minimum_ground_level(u64 seed, const v2s16 &sectorpos, double p)
 {
 	v2s16 node_min = sectorpos*MAP_BLOCKSIZE;
 	v2s16 node_max = (sectorpos+v2s16(1,1))*MAP_BLOCKSIZE-v2s16(1,1);
@@ -1304,7 +1307,7 @@ double get_sector_minimum_ground_level(u64 seed, v2s16 sectorpos, double p)
 	return a;
 }
 
-bool block_is_underground(u64 seed, v3s16 blockpos)
+bool block_is_underground(u64 seed, const v3s16 &blockpos)
 {
 	s16 minimum_groundlevel = (s16)get_sector_minimum_ground_level(
 			seed, v2s16(blockpos.X, blockpos.Z));
@@ -1318,7 +1321,7 @@ bool block_is_underground(u64 seed, v3s16 blockpos)
 #if 0
 #define AVERAGE_MUD_AMOUNT 4
 
-double base_rock_level_2d(u64 seed, v2s16 p)
+double base_rock_level_2d(u64 seed, const v2s16 &p)
 {
 	// The base ground level
 	double base = (double)WATER_LEVEL - (double)AVERAGE_MUD_AMOUNT
@@ -1375,7 +1378,7 @@ double base_rock_level_2d(u64 seed, v2s16 p)
 	return h;
 }
 
-double get_mud_add_amount(u64 seed, v2s16 p)
+double get_mud_add_amount(u64 seed, const v2s16 &p)
 {
 	return ((float)AVERAGE_MUD_AMOUNT + 3.0 * noise2d_perlin(
 			0.5+(float)p.X/200, 0.5+(float)p.Y/200,
@@ -1383,7 +1386,7 @@ double get_mud_add_amount(u64 seed, v2s16 p)
 }
 #endif
 
-bool get_have_sand(u64 seed, v2s16 p2d)
+bool get_have_sand(u64 seed, const v2s16 &p2d)
 {
 	// Determine whether to have sand here
 	double sandnoise = noise2d_perlin(

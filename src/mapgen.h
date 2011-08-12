@@ -30,10 +30,10 @@ class ManualMapVoxelManipulator;
 namespace mapgen
 {
 	// Finds precise ground level at any position
-	s16 find_ground_level_from_noise(u64 seed, v2s16 p2d, s16 precision);
+	s16 find_ground_level_from_noise(u64 seed, const v2s16 &p2d, s16 precision);
 
 	// Find out if block is completely underground
-	bool block_is_underground(u64 seed, v3s16 blockpos);
+	bool block_is_underground(u64 seed, const v3s16 &blockpos);
 
 	// Main map generation routine
 	void make_block(BlockMakeData *data);
@@ -44,8 +44,8 @@ namespace mapgen
 	/*
 		These are used by FarMesh
 	*/
-	bool get_have_sand(u64 seed, v2s16 p2d);
-	double tree_amount_2d(u64 seed, v2s16 p);
+	bool get_have_sand(u64 seed, const v2s16 &p2d);
+	double tree_amount_2d(u64 seed, const v2s16 &p);
 	
 
 	struct BlockMakeData
