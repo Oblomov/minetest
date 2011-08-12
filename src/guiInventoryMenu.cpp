@@ -81,7 +81,7 @@ void drawInventoryItem(video::IVideoDriver *driver,
 GUIInventoryMenu::GUIInventoryMenu(gui::IGUIEnvironment* env,
 		gui::IGUIElement* parent, s32 id,
 		IMenuManager *menumgr,
-		v2s16 menu_size,
+		const v2s16 &menu_size,
 		InventoryContext *c,
 		InventoryManager *invmgr
 		):
@@ -123,7 +123,7 @@ void GUIInventoryMenu::removeChildren()
 	}*/
 }
 
-void GUIInventoryMenu::regenerateGui(v2u32 screensize)
+void GUIInventoryMenu::regenerateGui(const v2u32 &screensize)
 {
 	// Remove children
 	removeChildren();
@@ -188,7 +188,7 @@ void GUIInventoryMenu::regenerateGui(v2u32 screensize)
 	}
 }
 
-GUIInventoryMenu::ItemSpec GUIInventoryMenu::getItemAtPos(v2s32 p) const
+GUIInventoryMenu::ItemSpec GUIInventoryMenu::getItemAtPos(const v2s32 &p) const
 {
 	core::rect<s32> imgrect(0,0,imgsize.X,imgsize.Y);
 	

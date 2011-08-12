@@ -67,7 +67,7 @@ void GUIMainMenu::removeChildren()
 	}
 }
 
-void GUIMainMenu::regenerateGui(v2u32 screensize)
+void GUIMainMenu::regenerateGui(const v2u32 &screensize)
 {
 	std::wstring text_name;
 	std::wstring text_address;

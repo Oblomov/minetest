@@ -57,7 +57,7 @@ void GUITextInputMenu::removeChildren()
 	}
 }
 
-void GUITextInputMenu::regenerateGui(v2u32 screensize)
+void GUITextInputMenu::regenerateGui(const v2u32 &screensize)
 {
 	std::wstring text;
 

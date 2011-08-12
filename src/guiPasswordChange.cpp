@@ -68,7 +68,7 @@ void GUIPasswordChange::removeChildren()
 	}
 }
 
-void GUIPasswordChange::regenerateGui(v2u32 screensize)
+void GUIPasswordChange::regenerateGui(const v2u32 &screensize)
 {
 	/*
 		Remove stuff

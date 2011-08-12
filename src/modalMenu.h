@@ -66,7 +66,7 @@ public:
 		m_allow_focus_removal = allow;
 	}
 
-	bool canTakeFocus(gui::IGUIElement *e)
+	bool canTakeFocus(gui::IGUIElement *e) const
 	{
 		return (e && (e == this || isMyChild(e))) || m_allow_focus_removal;
 	}
@@ -119,7 +119,7 @@ public:
 		}
 	}
 
-	virtual void regenerateGui(v2u32 screensize) = 0;
+	virtual void regenerateGui(const v2u32 &screensize) = 0;
 	virtual void drawMenu() = 0;
 	virtual bool OnEvent(const SEvent& event) { return false; };
 

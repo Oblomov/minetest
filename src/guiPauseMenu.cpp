@@ -74,7 +74,7 @@ void GUIPauseMenu::removeChildren()
 	}
 }
 
-void GUIPauseMenu::regenerateGui(v2u32 screensize)
+void GUIPauseMenu::regenerateGui(const v2u32 &screensize)
 {
 	/*
 		Remove stuff

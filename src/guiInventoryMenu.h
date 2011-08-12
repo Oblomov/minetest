@@ -64,7 +64,7 @@ class GUIInventoryMenu : public GUIModalMenu
 		}
 		ListDrawSpec(const std::string &a_inventoryname,
 				const std::string &a_listname,
-				v2s32 a_pos, v2s32 a_geom)
+				const v2s32 &a_pos, const v2s32 &a_geom)
 		{
 			inventoryname = a_inventoryname;
 			listname = a_listname;
@@ -86,8 +86,8 @@ public:
 		DrawSpec(const std::string &a_type,
 				const std::string &a_name,
 				const std::string &a_subname,
-				v2s32 a_pos,
-				v2s32 a_geom)
+				const v2s32 &a_pos,
+				const v2s32 &a_geom)
 		{
 			type = a_type;
 			name = a_name;
@@ -112,7 +112,7 @@ public:
 	GUIInventoryMenu(gui::IGUIEnvironment* env,
 			gui::IGUIElement* parent, s32 id,
 			IMenuManager *menumgr,
-			v2s16 menu_size,
+			const v2s16 &menu_size,
 			InventoryContext *c,
 			InventoryManager *invmgr
 			);
@@ -127,9 +127,9 @@ public:
 	/*
 		Remove and re-add (or reposition) stuff
 	*/
-	void regenerateGui(v2u32 screensize);
+	void regenerateGui(const v2u32 &screensize);
 	
-	ItemSpec getItemAtPos(v2s32 p) const;
+	ItemSpec getItemAtPos(const v2s32 &p) const;
 	void drawList(const ListDrawSpec &s);
 	void drawMenu();
 

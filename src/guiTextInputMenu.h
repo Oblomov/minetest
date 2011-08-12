@@ -44,7 +44,7 @@ public:
 	/*
 		Remove and re-add (or reposition) stuff
 	*/
-	void regenerateGui(v2u32 screensize);
+	void regenerateGui(const v2u32 &screensize);
 
 	void drawMenu();
 

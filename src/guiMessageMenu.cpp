@@ -54,7 +54,7 @@ void GUIMessageMenu::removeChildren()
 	}
 }
 
-void GUIMessageMenu::regenerateGui(v2u32 screensize)
+void GUIMessageMenu::regenerateGui(const v2u32 &screensize)
 {
 	/*
 		Remove stuff

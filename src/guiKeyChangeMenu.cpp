@@ -54,7 +54,7 @@ void GUIKeyChangeMenu::removeChildren()
 	}
 }
 
-void GUIKeyChangeMenu::regenerateGui(v2u32 screensize)
+void GUIKeyChangeMenu::regenerateGui(const v2u32 &screensize)
 {
 	/*
 	 Remove stuff
