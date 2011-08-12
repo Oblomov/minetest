@@ -36,14 +36,14 @@ struct StaticObject
 		pos(0,0,0)
 	{
 	}
-	StaticObject(u8 type_, v3f pos_, const std::string &data_):
+	StaticObject(u8 type_, const v3f &pos_, const std::string &data_):
 		type(type_),
 		pos(pos_),
 		data(data_)
 	{
 	}
 
-	void serialize(std::ostream &os)
+	void serialize(std::ostream &os) const
 	{
 		char buf[12];
 		// type
@@ -110,7 +110,7 @@ public:
 		m_active.remove(id);
 	}
 
-	void serialize(std::ostream &os)
+	void serialize(std::ostream &os) const
 	{
 		char buf[12];
 		// version
@@ -120,15 +120,15 @@ public:
 		u16 count = m_stored.size() + m_active.size();
 		writeU16((u8*)buf, count);
 		os.write(buf, 2);
-		for(core::list<StaticObject>::Iterator
+		for(core::list<StaticObject>::ConstIterator
 				i = m_stored.begin();
 				i != m_stored.end(); i++)
 		{
-			StaticObject &s_obj = *i;
+			const StaticObject &s_obj = *i;
 			s_obj.serialize(os);
 		}
-		for(core::map<u16, StaticObject>::Iterator
-				i = m_active.getIterator();
+		for(core::map<u16, StaticObject>::ConstIterator
+				i = m_active.getConstIterator();
 				i.atEnd()==false; i++)
 		{
 			StaticObject s_obj = i.getNode()->getValue();
