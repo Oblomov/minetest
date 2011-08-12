@@ -81,21 +81,21 @@ public:
 	AuthManager(const std::string &authfilepath);
 	~AuthManager();
 	void load();
-	void save();
-	bool exists(const std::string &username);
+	void save() const;
+	bool exists(const std::string &username) const;
 	void set(const std::string &username, AuthData ad);
 	void add(const std::string &username);
-	std::string getPassword(const std::string &username);
+	const std::string &getPassword(const std::string &username) const;
 	void setPassword(const std::string &username,
 			const std::string &password);
-	u64 getPrivs(const std::string &username);
+	u64 getPrivs(const std::string &username) const;
 	void setPrivs(const std::string &username, u64 privs);
-	bool isModified();
+	bool isModified() const;
 private:
-	JMutex m_mutex;
+	mutable JMutex m_mutex;
 	std::string m_authfilepath;
 	core::map<std::string, AuthData> m_authdata;
-	bool m_modified;
+	mutable bool m_modified;
 };
 
 #endif

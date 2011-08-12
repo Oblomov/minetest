@@ -147,7 +147,7 @@ void AuthManager::load()
 	m_modified = false;
 }
 
-void AuthManager::save()
+void AuthManager::save() const
 {
 	JMutexAutoLock lock(m_mutex);
 	
@@ -159,8 +159,8 @@ void AuthManager::save()
 		throw SerializationError("AuthManager::save(): Couldn't open file");
 	}
 	
-	for(core::map<std::string, AuthData>::Iterator
-			i = m_authdata.getIterator();
+	for(core::map<std::string, AuthData>::ConstIterator
+			i = m_authdata.getConstIterator();
 			i.atEnd()==false; i++)
 	{
 		std::string name = i.getNode()->getKey();
@@ -173,7 +173,7 @@ void AuthManager::save()
 	m_modified = false;
 }
 
-bool AuthManager::exists(const std::string &username)
+bool AuthManager::exists(const std::string &username) const
 {
 	JMutexAutoLock lock(m_mutex);
 	
@@ -202,7 +202,7 @@ void AuthManager::add(const std::string &username)
 	m_modified = true;
 }
 
-std::string AuthManager::getPassword(const std::string &username)
+const std::string &AuthManager::getPassword(const std::string &username) const
 {
 	JMutexAutoLock lock(m_mutex);
 	
@@ -231,7 +231,7 @@ void AuthManager::setPassword(const std::string &username,
 	m_modified = true;
 }
 
-u64 AuthManager::getPrivs(const std::string &username)
+u64 AuthManager::getPrivs(const std::string &username) const
 {
 	JMutexAutoLock lock(m_mutex);
 	
@@ -259,7 +259,7 @@ void AuthManager::setPrivs(const std::string &username, u64 privs)
 	m_modified = true;
 }
 
-bool AuthManager::isModified()
+bool AuthManager::isModified() const
 {
 	JMutexAutoLock lock(m_mutex);
 	return m_modified;
