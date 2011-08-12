@@ -76,7 +76,7 @@ std::string item_craft_get_image_name(const std::string &subname)
 }
 
 ServerActiveObject* item_craft_create_object(const std::string &subname,
-		ServerEnvironment *env, u16 id, v3f pos)
+		ServerEnvironment *env, u16 id, const v3f &pos)
 {
 	if(subname == "rat")
 	{
