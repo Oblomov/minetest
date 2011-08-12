@@ -213,7 +213,7 @@ void Clouds::step(float dtime)
 	m_time += dtime;
 }
 
-void Clouds::update(v2f camera_p, float brightness)
+void Clouds::update(const v2f &camera_p, float brightness)
 {
 	m_camera_pos = camera_p;
 	m_brightness = brightness;

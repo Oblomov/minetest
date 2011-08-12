@@ -65,7 +65,7 @@ public:
 
 	void step(float dtime);
 
-	void update(v2f camera_p, float brightness);
+	void update(const v2f &camera_p, float brightness);
 
 private:
 	video::SMaterial m_material;
