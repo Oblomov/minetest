@@ -77,6 +77,18 @@ re_search:
 	}
 }
 
+const Player * Environment::getPlayer(u16 peer_id) const
+{
+	for(core::list<Player*>::ConstIterator i = m_players.begin();
+			i != m_players.end(); i++)
+	{
+		const Player *player = *i;
+		if(player->peer_id == peer_id)
+			return player;
+	}
+	return NULL;
+}
+
 Player * Environment::getPlayer(u16 peer_id)
 {
 	for(core::list<Player*>::Iterator i = m_players.begin();
@@ -84,6 +96,18 @@ Player * Environment::getPlayer(u16 peer_id)
 	{
 		Player *player = *i;
 		if(player->peer_id == peer_id)
+			return player;
+	}
+	return NULL;
+}
+
+const Player * Environment::getPlayer(const char *name) const
+{
+	for(core::list<Player*>::ConstIterator i = m_players.begin();
+			i != m_players.end(); i++)
+	{
+		const Player *player = *i;
+		if(strcmp(player->getName(), name) == 0)
 			return player;
 	}
 	return NULL;
@@ -97,6 +121,25 @@ Player * Environment::getPlayer(const char *name)
 		Player *player = *i;
 		if(strcmp(player->getName(), name) == 0)
 			return player;
+	}
+	return NULL;
+}
+
+const Player * Environment::getRandomConnectedPlayer() const
+{
+	core::list<const Player*> connected_players = getPlayers(true);
+	u32 chosen_one = myrand() % connected_players.size();
+	u32 j = 0;
+	for(core::list<const Player*>::ConstIterator
+			i = connected_players.begin();
+			i != connected_players.end(); i++)
+	{
+		if(j == chosen_one)
+		{
+			const Player *player = *i;
+			return player;
+		}
+		j++;
 	}
 	return NULL;
 }
@@ -120,7 +163,27 @@ Player * Environment::getRandomConnectedPlayer()
 	return NULL;
 }
 
-Player * Environment::getNearestConnectedPlayer(v3f pos)
+const Player * Environment::getNearestConnectedPlayer(const v3f &pos) const
+{
+	core::list<const Player*> connected_players = getPlayers(true);
+	f32 nearest_d = 0;
+	const Player *nearest_player = NULL;
+	for(core::list<const Player*>::ConstIterator
+			i = connected_players.begin();
+			i != connected_players.end(); i++)
+	{
+		const Player *player = *i;
+		f32 d = player->getPosition().getDistanceFrom(pos);
+		if(d < nearest_d || nearest_player == NULL)
+		{
+			nearest_d = d;
+			nearest_player = player;
+		}
+	}
+	return nearest_player;
+}
+
+Player * Environment::getNearestConnectedPlayer(const v3f &pos)
 {
 	core::list<Player*> connected_players = getPlayers(true);
 	f32 nearest_d = 0;
@@ -140,9 +203,30 @@ Player * Environment::getNearestConnectedPlayer(v3f pos)
 	return nearest_player;
 }
 
-core::list<Player*> Environment::getPlayers()
+const core::list<Player*> &Environment::getPlayers() const
 {
 	return m_players;
+}
+
+core::list<const Player*> Environment::getPlayers(bool ignore_disconnected) const
+{
+	core::list<const Player*> newlist;
+	for(core::list<Player*>::ConstIterator
+			i = m_players.begin();
+			i != m_players.end(); i++)
+	{
+		const Player *player = *i;
+
+		if(ignore_disconnected)
+		{
+			// Ignore disconnected players
+			if(player->peer_id == 0)
+				continue;
+		}
+
+		newlist.push_back(player);
+	}
+	return newlist;
 }
 
 core::list<Player*> Environment::getPlayers(bool ignore_disconnected)
@@ -166,10 +250,10 @@ core::list<Player*> Environment::getPlayers(bool ignore_disconnected)
 	return newlist;
 }
 
-void Environment::printPlayers(std::ostream &o)
+void Environment::printPlayers(std::ostream &o) const
 {
 	o<<"Players in environment:"<<std::endl;
-	for(core::list<Player*>::Iterator i = m_players.begin();
+	for(core::list<Player*>::ConstIterator i = m_players.begin();
 			i != m_players.end(); i++)
 	{
 		Player *player = *i;
@@ -182,7 +266,7 @@ void Environment::printPlayers(std::ostream &o)
 	getDayNightRatio() = r;
 }*/
 
-u32 Environment::getDayNightRatio()
+u32 Environment::getDayNightRatio() const
 {
 	//return getDayNightRatio();
 	return time_to_daynight_ratio(m_time_of_day);
@@ -284,12 +368,12 @@ ServerEnvironment::~ServerEnvironment()
 	m_map->drop();
 }
 
-void ServerEnvironment::serializePlayers(const std::string &savedir)
+void ServerEnvironment::serializePlayers(const std::string &savedir) const
 {
 	std::string players_path = savedir + "/players";
 	fs::CreateDir(players_path);
 
-	core::map<Player*, bool> saved_players;
+	core::map<const Player*, bool> saved_players;
 
 	std::vector<fs::DirListNode> player_files = fs::GetDirListing(players_path);
 	for(u32 i=0; i<player_files.size(); i++)
@@ -319,7 +403,7 @@ void ServerEnvironment::serializePlayers(const std::string &savedir)
 		
 		// Search for the player
 		std::string playername = testplayer.getName();
-		Player *player = getPlayer(playername.c_str());
+		const Player *player = getPlayer(playername.c_str());
 		if(player == NULL)
 		{
 			dstream<<"Didn't find matching player, ignoring file "<<path<<std::endl;
@@ -342,7 +426,7 @@ void ServerEnvironment::serializePlayers(const std::string &savedir)
 		}
 	}
 
-	for(core::list<Player*>::Iterator i = m_players.begin();
+	for(core::list<Player*>::ConstIterator i = m_players.begin();
 			i != m_players.end(); i++)
 	{
 		Player *player = *i;
@@ -468,7 +552,7 @@ void ServerEnvironment::deSerializePlayers(const std::string &savedir)
 	}
 }
 
-void ServerEnvironment::saveMeta(const std::string &savedir)
+void ServerEnvironment::saveMeta(const std::string &savedir) const
 {
 	std::string path = savedir + "/env_meta.txt";
 
@@ -1020,6 +1104,15 @@ void ServerEnvironment::step(float dtime)
 	} // enable_experimental
 }
 
+const ServerActiveObject* ServerEnvironment::getActiveObject(u16 id) const
+{
+	core::map<u16, ServerActiveObject*>::Node *n;
+	n = m_active_objects.find(id);
+	if(n == NULL)
+		return NULL;
+	return n->getValue();
+}
+
 ServerActiveObject* ServerEnvironment::getActiveObject(u16 id)
 {
 	core::map<u16, ServerActiveObject*>::Node *n;
@@ -1072,9 +1165,9 @@ u16 ServerEnvironment::addActiveObject(ServerActiveObject *object)
 	Finds out what new objects have been added to
 	inside a radius around a position
 */
-void ServerEnvironment::getAddedActiveObjects(v3s16 pos, s16 radius,
+void ServerEnvironment::getAddedActiveObjects(const v3s16 &pos, s16 radius,
 		core::map<u16, bool> &current_objects,
-		core::map<u16, bool> &added_objects)
+		core::map<u16, bool> &added_objects) const
 {
 	v3f pos_f = intToFloat(pos, BS);
 	f32 radius_f = radius * BS;
@@ -1085,8 +1178,8 @@ void ServerEnvironment::getAddedActiveObjects(v3s16 pos, s16 radius,
 		- discard objects that are found in current_objects.
 		- add remaining objects to added_objects
 	*/
-	for(core::map<u16, ServerActiveObject*>::Iterator
-			i = m_active_objects.getIterator();
+	for(core::map<u16, ServerActiveObject*>::ConstIterator
+			i = m_active_objects.getConstIterator();
 			i.atEnd()==false; i++)
 	{
 		u16 id = i.getNode()->getKey();
@@ -1115,9 +1208,9 @@ void ServerEnvironment::getAddedActiveObjects(v3s16 pos, s16 radius,
 	Finds out what objects have been removed from
 	inside a radius around a position
 */
-void ServerEnvironment::getRemovedActiveObjects(v3s16 pos, s16 radius,
+void ServerEnvironment::getRemovedActiveObjects(const v3s16 &pos, s16 radius,
 		core::map<u16, bool> &current_objects,
-		core::map<u16, bool> &removed_objects)
+		core::map<u16, bool> &removed_objects) const
 {
 	v3f pos_f = intToFloat(pos, BS);
 	f32 radius_f = radius * BS;
@@ -1129,12 +1222,12 @@ void ServerEnvironment::getRemovedActiveObjects(v3s16 pos, s16 radius,
 		- object has m_removed=true, or
 		- object is too far away
 	*/
-	for(core::map<u16, bool>::Iterator
-			i = current_objects.getIterator();
+	for(core::map<u16, bool>::ConstIterator
+			i = current_objects.getConstIterator();
 			i.atEnd()==false; i++)
 	{
 		u16 id = i.getNode()->getKey();
-		ServerActiveObject *object = getActiveObject(id);
+		const ServerActiveObject *object = getActiveObject(id);
 		if(object == NULL)
 		{
 			dstream<<"WARNING: ServerEnvironment::getRemovedActiveObjects():"
@@ -1482,9 +1575,9 @@ void ClientEnvironment::addPlayer(Player *player)
 	Environment::addPlayer(player);
 }
 
-LocalPlayer * ClientEnvironment::getLocalPlayer()
+LocalPlayer * ClientEnvironment::getLocalPlayer() const
 {
-	for(core::list<Player*>::Iterator i = m_players.begin();
+	for(core::list<Player*>::ConstIterator i = m_players.begin();
 			i != m_players.end(); i++)
 	{
 		Player *player = *i;
@@ -1751,7 +1844,7 @@ void ClientEnvironment::step(float dtime)
 	}
 }
 
-void ClientEnvironment::updateMeshes(v3s16 blockpos)
+void ClientEnvironment::updateMeshes(const v3s16 &blockpos)
 {
 	m_map->updateMeshes(blockpos, getDayNightRatio());
 }
@@ -1761,7 +1854,7 @@ void ClientEnvironment::expireMeshes(bool only_daynight_diffed)
 	m_map->expireMeshes(only_daynight_diffed);
 }
 
-ClientActiveObject* ClientEnvironment::getActiveObject(u16 id)
+ClientActiveObject* ClientEnvironment::getActiveObject(u16 id) const
 {
 	core::map<u16, ClientActiveObject*>::Node *n;
 	n = m_active_objects.find(id);
@@ -1904,11 +1997,11 @@ void ClientEnvironment::damageLocalPlayer(u8 damage)
 	Client likes to call these
 */
 	
-void ClientEnvironment::getActiveObjects(v3f origin, f32 max_d,
-		core::array<DistanceSortedActiveObject> &dest)
+void ClientEnvironment::getActiveObjects(const v3f &origin, f32 max_d,
+		core::array<DistanceSortedActiveObject> &dest) const
 {
-	for(core::map<u16, ClientActiveObject*>::Iterator
-			i = m_active_objects.getIterator();
+	for(core::map<u16, ClientActiveObject*>::ConstIterator
+			i = m_active_objects.getConstIterator();
 			i.atEnd()==false; i++)
 	{
 		ClientActiveObject* obj = i.getNode()->getValue();
@@ -1935,7 +2028,8 @@ ClientEnvEvent ClientEnvironment::getClientEvent()
 	return m_client_event_queue.pop_front();
 }
 
-void ClientEnvironment::drawPostFx(video::IVideoDriver* driver, v3f camera_pos)
+void ClientEnvironment::drawPostFx(video::IVideoDriver* driver,
+		const v3f &camera_pos) const
 {
 	/*LocalPlayer *player = getLocalPlayer();
 	assert(player);

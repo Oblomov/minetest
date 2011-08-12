@@ -57,20 +57,25 @@ public:
 	*/
 	virtual void step(f32 dtime) = 0;
 
-	virtual Map & getMap() = 0;
+	virtual Map & getMap() const = 0;
 
 	virtual void addPlayer(Player *player);
 	void removePlayer(u16 peer_id);
+	const Player * getPlayer(u16 peer_id) const;
 	Player * getPlayer(u16 peer_id);
+	const Player * getPlayer(const char *name) const;
 	Player * getPlayer(const char *name);
+	const Player * getRandomConnectedPlayer() const;
 	Player * getRandomConnectedPlayer();
-	Player * getNearestConnectedPlayer(v3f pos);
-	core::list<Player*> getPlayers();
+	const Player * getNearestConnectedPlayer(const v3f &pos) const;
+	Player * getNearestConnectedPlayer(const v3f &pos);
+	const core::list<Player*> &getPlayers() const;
+	core::list<const Player*> getPlayers(bool ignore_disconnected) const;
 	core::list<Player*> getPlayers(bool ignore_disconnected);
-	void printPlayers(std::ostream &o);
+	void printPlayers(std::ostream &o) const;
 	
 	//void setDayNightRatio(u32 r);
-	u32 getDayNightRatio();
+	u32 getDayNightRatio() const;
 	
 	// 0-23999
 	virtual void setTimeOfDay(u32 time)
@@ -78,7 +83,7 @@ public:
 		m_time_of_day = time;
 	}
 
-	u32 getTimeOfDay()
+	u32 getTimeOfDay() const
 	{
 		return m_time_of_day;
 	}
@@ -104,7 +109,7 @@ public:
 			core::map<v3s16, bool> &blocks_removed,
 			core::map<v3s16, bool> &blocks_added);
 
-	bool contains(v3s16 p){
+	bool contains(const v3s16 &p){
 		return (m_list.find(p) != NULL);
 	}
 
@@ -129,17 +134,17 @@ public:
 	ServerEnvironment(ServerMap *map, Server *server);
 	~ServerEnvironment();
 
-	Map & getMap()
+	Map & getMap() const
 	{
 		return *m_map;
 	}
 
-	ServerMap & getServerMap()
+	ServerMap & getServerMap() const
 	{
 		return *m_map;
 	}
 
-	Server * getServer()
+	Server * getServer() const
 	{
 		return m_server;
 	}
@@ -149,13 +154,13 @@ public:
 	/*
 		Save players
 	*/
-	void serializePlayers(const std::string &savedir);
+	void serializePlayers(const std::string &savedir) const;
 	void deSerializePlayers(const std::string &savedir);
 
 	/*
 		Save and load time of day and game timer
 	*/
-	void saveMeta(const std::string &savedir);
+	void saveMeta(const std::string &savedir) const;
 	void loadMeta(const std::string &savedir);
 
 	/*
@@ -163,6 +168,7 @@ public:
 		-------------------------------------------
 	*/
 
+	const ServerActiveObject* getActiveObject(u16 id) const;
 	ServerActiveObject* getActiveObject(u16 id);
 
 	/*
@@ -179,17 +185,17 @@ public:
 		Find out what new objects have been added to
 		inside a radius around a position
 	*/
-	void getAddedActiveObjects(v3s16 pos, s16 radius,
+	void getAddedActiveObjects(const v3s16 &pos, s16 radius,
 			core::map<u16, bool> &current_objects,
-			core::map<u16, bool> &added_objects);
+			core::map<u16, bool> &added_objects) const;
 
 	/*
 		Find out what new objects have been removed from
 		inside a radius around a position
 	*/
-	void getRemovedActiveObjects(v3s16 pos, s16 radius,
+	void getRemovedActiveObjects(const v3s16 &pos, s16 radius,
 			core::map<u16, bool> &current_objects,
-			core::map<u16, bool> &removed_objects);
+			core::map<u16, bool> &removed_objects) const;
 	
 	/*
 		Get the next message emitted by some active object.
@@ -292,13 +298,13 @@ public:
 	virtual ~ActiveBlockModifier(){};
 
 	//virtual core::list<u8> update(ServerEnvironment *env) = 0;
-	virtual u32 getTriggerContentCount(){ return 1;}
-	virtual u8 getTriggerContent(u32 i) = 0;
-	virtual float getActiveInterval() = 0;
+	virtual u32 getTriggerContentCount() const { return 1;}
+	virtual u8 getTriggerContent(u32 i) const = 0;
+	virtual float getActiveInterval() const = 0;
 	// chance of (1 / return value), 0 is disallowed
-	virtual u32 getActiveChance() = 0;
+	virtual u32 getActiveChance() const = 0;
 	// This is called usually at interval for 1/chance of the nodes
-	virtual void triggerEvent(ServerEnvironment *env, v3s16 p) = 0;
+	virtual void triggerEvent(ServerEnvironment *env, const v3s16 &p) = 0;
 };
 
 #ifndef SERVER
@@ -337,12 +343,12 @@ public:
 	ClientEnvironment(ClientMap *map, scene::ISceneManager *smgr);
 	~ClientEnvironment();
 
-	Map & getMap()
+	Map & getMap() const
 	{
 		return *m_map;
 	}
 
-	ClientMap & getClientMap()
+	ClientMap & getClientMap() const
 	{
 		return *m_map;
 	}
@@ -350,9 +356,9 @@ public:
 	void step(f32 dtime);
 
 	virtual void addPlayer(Player *player);
-	LocalPlayer * getLocalPlayer();
+	LocalPlayer * getLocalPlayer() const;
 
-	void updateMeshes(v3s16 blockpos);
+	void updateMeshes(const v3s16 &blockpos);
 	void expireMeshes(bool only_daynight_diffed);
 
 	void setTimeOfDay(u32 time)
@@ -373,7 +379,7 @@ public:
 		ActiveObjects
 	*/
 	
-	ClientActiveObject* getActiveObject(u16 id);
+	ClientActiveObject* getActiveObject(u16 id) const;
 
 	/*
 		Adds an active object to the environment.
@@ -401,14 +407,16 @@ public:
 	*/
 	
 	// Get all nearby objects
-	void getActiveObjects(v3f origin, f32 max_d,
-			core::array<DistanceSortedActiveObject> &dest);
+	void getActiveObjects(const v3f &origin, f32 max_d,
+			core::array<DistanceSortedActiveObject> &dest
+			) const;
 	
 	// Get event from queue. CEE_NONE is returned if queue is empty.
 	ClientEnvEvent getClientEvent();
 
 	// Post effects
-	void drawPostFx(video::IVideoDriver* driver, v3f camera_pos);
+	void drawPostFx(video::IVideoDriver* driver,
+			const v3f &camera_pos) const;
 	
 private:
 	ClientMap *m_map;
