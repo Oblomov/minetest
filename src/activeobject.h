@@ -28,7 +28,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 struct ActiveObjectMessage
 {
-	ActiveObjectMessage(u16 id_, bool reliable_=true, std::string data_=""):
+	ActiveObjectMessage(u16 id_, bool reliable_=true,
+			const std::string &data_=""):
 		id(id_),
 		reliable(reliable_),
 		datastring(data_)
@@ -50,7 +51,7 @@ public:
 	{
 	}
 	
-	u16 getId()
+	u16 getId() const
 	{
 		return m_id;
 	}
