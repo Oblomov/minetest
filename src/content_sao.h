@@ -26,11 +26,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 class TestSAO : public ServerActiveObject
 {
 public:
-	TestSAO(ServerEnvironment *env, u16 id, v3f pos);
+	TestSAO(ServerEnvironment *env, u16 id, const v3f &pos);
 	u8 getType() const
 		{return ACTIVEOBJECT_TYPE_TEST;}
-	static ServerActiveObject* create(ServerEnvironment *env, u16 id, v3f pos,
-			const std::string &data);
+	static ServerActiveObject* create(ServerEnvironment *env, u16 id,
+			const v3f &pos, const std::string &data);
 	void step(float dtime, bool send_recommended);
 private:
 	float m_timer1;
@@ -40,17 +40,17 @@ private:
 class ItemSAO : public ServerActiveObject
 {
 public:
-	ItemSAO(ServerEnvironment *env, u16 id, v3f pos,
+	ItemSAO(ServerEnvironment *env, u16 id, const v3f &pos,
 			const std::string inventorystring);
 	u8 getType() const
 		{return ACTIVEOBJECT_TYPE_ITEM;}
-	static ServerActiveObject* create(ServerEnvironment *env, u16 id, v3f pos,
-			const std::string &data);
+	static ServerActiveObject* create(ServerEnvironment *env, u16 id,
+			const v3f &pos, const std::string &data);
 	void step(float dtime, bool send_recommended);
-	std::string getClientInitializationData();
-	std::string getStaticData();
-	InventoryItem* createInventoryItem();
-	InventoryItem* createPickedUpItem(){return createInventoryItem();}
+	std::string getClientInitializationData() const;
+	std::string getStaticData() const;
+	InventoryItem* createInventoryItem() const;
+	InventoryItem* createPickedUpItem() const {return createInventoryItem();}
 	void rightClick(Player *player);
 private:
 	std::string m_inventorystring;
@@ -62,15 +62,15 @@ private:
 class RatSAO : public ServerActiveObject
 {
 public:
-	RatSAO(ServerEnvironment *env, u16 id, v3f pos);
+	RatSAO(ServerEnvironment *env, u16 id, const v3f &pos);
 	u8 getType() const
 		{return ACTIVEOBJECT_TYPE_RAT;}
-	static ServerActiveObject* create(ServerEnvironment *env, u16 id, v3f pos,
+	static ServerActiveObject* create(ServerEnvironment *env, u16 id, const v3f &pos,
 			const std::string &data);
 	void step(float dtime, bool send_recommended);
-	std::string getClientInitializationData();
-	std::string getStaticData();
-	InventoryItem* createPickedUpItem();
+	std::string getClientInitializationData() const;
+	std::string getStaticData() const;
+	InventoryItem* createPickedUpItem() const;
 private:
 	bool m_is_active;
 	IntervalLimiter m_inactive_interval;
@@ -87,16 +87,16 @@ private:
 class Oerkki1SAO : public ServerActiveObject
 {
 public:
-	Oerkki1SAO(ServerEnvironment *env, u16 id, v3f pos);
+	Oerkki1SAO(ServerEnvironment *env, u16 id, const v3f &pos);
 	u8 getType() const
 		{return ACTIVEOBJECT_TYPE_OERKKI1;}
-	static ServerActiveObject* create(ServerEnvironment *env, u16 id, v3f pos,
-			const std::string &data);
+	static ServerActiveObject* create(ServerEnvironment *env, u16 id,
+			const v3f &pos, const std::string &data);
 	void step(float dtime, bool send_recommended);
-	std::string getClientInitializationData();
-	std::string getStaticData();
-	InventoryItem* createPickedUpItem(){return NULL;}
-	u16 punch(const std::string &toolname, v3f dir);
+	std::string getClientInitializationData() const;
+	std::string getStaticData() const;
+	InventoryItem* createPickedUpItem() const {return NULL;}
+	u16 punch(const std::string &toolname, const v3f &dir);
 private:
 	void doDamage(u16 d);
 
@@ -117,15 +117,15 @@ private:
 class FireflySAO : public ServerActiveObject
 {
 public:
-	FireflySAO(ServerEnvironment *env, u16 id, v3f pos);
+	FireflySAO(ServerEnvironment *env, u16 id, const v3f &pos);
 	u8 getType() const
 		{return ACTIVEOBJECT_TYPE_FIREFLY;}
-	static ServerActiveObject* create(ServerEnvironment *env, u16 id, v3f pos,
-			const std::string &data);
+	static ServerActiveObject* create(ServerEnvironment *env, u16 id,
+			const v3f &pos, const std::string &data);
 	void step(float dtime, bool send_recommended);
-	std::string getClientInitializationData();
-	std::string getStaticData();
-	InventoryItem* createPickedUpItem();
+	std::string getClientInitializationData() const;
+	std::string getStaticData() const;
+	InventoryItem* createPickedUpItem() const;
 private:
 	bool m_is_active;
 	IntervalLimiter m_inactive_interval;

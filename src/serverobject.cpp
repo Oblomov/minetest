@@ -21,7 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fstream>
 #include "inventory.h"
 
-ServerActiveObject::ServerActiveObject(ServerEnvironment *env, u16 id, v3f pos):
+ServerActiveObject::ServerActiveObject(ServerEnvironment *env, u16 id,
+		const v3f &pos):
 	ActiveObject(id),
 	m_known_by_count(0),
 	m_removed(false),
@@ -38,7 +39,7 @@ ServerActiveObject::~ServerActiveObject()
 }
 
 ServerActiveObject* ServerActiveObject::create(u8 type,
-		ServerEnvironment *env, u16 id, v3f pos,
+		ServerEnvironment *env, u16 id, const v3f &pos,
 		const std::string &data)
 {
 	// Find factory function

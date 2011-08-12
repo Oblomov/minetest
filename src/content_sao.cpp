@@ -30,7 +30,7 @@ core::map<u16, ServerActiveObject::Factory> ServerActiveObject::m_types;
 // Prototype
 TestSAO proto_TestSAO(NULL, 0, v3f(0,0,0));
 
-TestSAO::TestSAO(ServerEnvironment *env, u16 id, v3f pos):
+TestSAO::TestSAO(ServerEnvironment *env, u16 id, const v3f &pos):
 	ServerActiveObject(env, id, pos),
 	m_timer1(0),
 	m_age(0)
@@ -38,8 +38,8 @@ TestSAO::TestSAO(ServerEnvironment *env, u16 id, v3f pos):
 	ServerActiveObject::registerType(getType(), create);
 }
 
-ServerActiveObject* TestSAO::create(ServerEnvironment *env, u16 id, v3f pos,
-		const std::string &data)
+ServerActiveObject* TestSAO::create(ServerEnvironment *env, u16 id,
+		const v3f &pos, const std::string &data)
 {
 	return new TestSAO(env, id, pos);
 }
@@ -89,7 +89,7 @@ void TestSAO::step(float dtime, bool send_recommended)
 // Prototype
 ItemSAO proto_ItemSAO(NULL, 0, v3f(0,0,0), "");
 
-ItemSAO::ItemSAO(ServerEnvironment *env, u16 id, v3f pos,
+ItemSAO::ItemSAO(ServerEnvironment *env, u16 id, const v3f &pos,
 		const std::string inventorystring):
 	ServerActiveObject(env, id, pos),
 	m_inventorystring(inventorystring),
@@ -99,8 +99,8 @@ ItemSAO::ItemSAO(ServerEnvironment *env, u16 id, v3f pos,
 	ServerActiveObject::registerType(getType(), create);
 }
 
-ServerActiveObject* ItemSAO::create(ServerEnvironment *env, u16 id, v3f pos,
-		const std::string &data)
+ServerActiveObject* ItemSAO::create(ServerEnvironment *env, u16 id,
+		const v3f &pos, const std::string &data)
 {
 	std::istringstream is(data, std::ios::binary);
 	char buf[1];
@@ -165,7 +165,7 @@ void ItemSAO::step(float dtime, bool send_recommended)
 	}
 }
 
-std::string ItemSAO::getClientInitializationData()
+std::string ItemSAO::getClientInitializationData() const
 {
 	std::ostringstream os(std::ios::binary);
 	char buf[6];
@@ -184,7 +184,7 @@ std::string ItemSAO::getClientInitializationData()
 	return os.str();
 }
 
-std::string ItemSAO::getStaticData()
+std::string ItemSAO::getStaticData() const
 {
 	dstream<<__FUNCTION_NAME<<std::endl;
 	std::ostringstream os(std::ios::binary);
@@ -197,7 +197,7 @@ std::string ItemSAO::getStaticData()
 	return os.str();
 }
 
-InventoryItem * ItemSAO::createInventoryItem()
+InventoryItem * ItemSAO::createInventoryItem() const
 {
 	try{
 		std::istringstream is(m_inventorystring, std::ios_base::binary);
@@ -235,7 +235,7 @@ void ItemSAO::rightClick(Player *player)
 // Prototype
 RatSAO proto_RatSAO(NULL, 0, v3f(0,0,0));
 
-RatSAO::RatSAO(ServerEnvironment *env, u16 id, v3f pos):
+RatSAO::RatSAO(ServerEnvironment *env, u16 id, const v3f &pos):
 	ServerActiveObject(env, id, pos),
 	m_is_active(false),
 	m_speed_f(0,0,0)
@@ -251,8 +251,8 @@ RatSAO::RatSAO(ServerEnvironment *env, u16 id, v3f pos):
 	m_touching_ground = false;
 }
 
-ServerActiveObject* RatSAO::create(ServerEnvironment *env, u16 id, v3f pos,
-		const std::string &data)
+ServerActiveObject* RatSAO::create(ServerEnvironment *env, u16 id,
+		const v3f &pos, const std::string &data)
 {
 	std::istringstream is(data, std::ios::binary);
 	char buf[1];
@@ -296,11 +296,11 @@ void RatSAO::step(float dtime, bool send_recommended)
 	bool player_is_close = false;
 	// Check connected players
 	core::list<Player*> players = m_env->getPlayers(true);
-	core::list<Player*>::Iterator i;
+	core::list<Player*>::ConstIterator i;
 	for(i = players.begin();
 			i != players.end(); i++)
 	{
-		Player *player = *i;
+		const Player *player = *i;
 		v3f playerpos = player->getPosition();
 		if(m_base_position.getDistanceFrom(playerpos) < BS*10.0)
 		{
@@ -387,7 +387,7 @@ void RatSAO::step(float dtime, bool send_recommended)
 	}
 }
 
-std::string RatSAO::getClientInitializationData()
+std::string RatSAO::getClientInitializationData() const
 {
 	std::ostringstream os(std::ios::binary);
 	// version
@@ -397,7 +397,7 @@ std::string RatSAO::getClientInitializationData()
 	return os.str();
 }
 
-std::string RatSAO::getStaticData()
+std::string RatSAO::getStaticData() const
 {
 	//dstream<<__FUNCTION_NAME<<std::endl;
 	std::ostringstream os(std::ios::binary);
@@ -406,7 +406,7 @@ std::string RatSAO::getStaticData()
 	return os.str();
 }
 
-InventoryItem* RatSAO::createPickedUpItem()
+InventoryItem* RatSAO::createPickedUpItem() const
 {
 	std::istringstream is("CraftItem rat 1", std::ios_base::binary);
 	InventoryItem *item = InventoryItem::deSerialize(is);
@@ -418,7 +418,7 @@ InventoryItem* RatSAO::createPickedUpItem()
 */
 
 // Y is copied, X and Z change is limited
-void accelerate_xz(v3f &speed, v3f target_speed, f32 max_increase)
+void accelerate_xz(v3f &speed, const v3f &target_speed, f32 max_increase)
 {
 	v3f d_wanted = target_speed - speed;
 	d_wanted.Y = 0;
@@ -437,7 +437,7 @@ void accelerate_xz(v3f &speed, v3f target_speed, f32 max_increase)
 // Prototype
 Oerkki1SAO proto_Oerkki1SAO(NULL, 0, v3f(0,0,0));
 
-Oerkki1SAO::Oerkki1SAO(ServerEnvironment *env, u16 id, v3f pos):
+Oerkki1SAO::Oerkki1SAO(ServerEnvironment *env, u16 id, const v3f &pos):
 	ServerActiveObject(env, id, pos),
 	m_is_active(false),
 	m_speed_f(0,0,0)
@@ -455,8 +455,8 @@ Oerkki1SAO::Oerkki1SAO(ServerEnvironment *env, u16 id, v3f pos):
 	m_after_jump_timer = 0;
 }
 
-ServerActiveObject* Oerkki1SAO::create(ServerEnvironment *env, u16 id, v3f pos,
-		const std::string &data)
+ServerActiveObject* Oerkki1SAO::create(ServerEnvironment *env, u16 id,
+		const v3f &pos, const std::string &data)
 {
 	std::istringstream is(data, std::ios::binary);
 	// read version
@@ -508,11 +508,11 @@ void Oerkki1SAO::step(float dtime, bool send_recommended)
 	v3f near_player_pos;
 	// Check connected players
 	core::list<Player*> players = m_env->getPlayers(true);
-	core::list<Player*>::Iterator i;
+	core::list<Player*>::ConstIterator i;
 	for(i = players.begin();
 			i != players.end(); i++)
 	{
-		Player *player = *i;
+		const Player *player = *i;
 		v3f playerpos = player->getPosition();
 		f32 dist = m_base_position.getDistanceFrom(playerpos);
 		if(dist < BS*1.45)
@@ -648,7 +648,7 @@ void Oerkki1SAO::step(float dtime, bool send_recommended)
 	}
 }
 
-std::string Oerkki1SAO::getClientInitializationData()
+std::string Oerkki1SAO::getClientInitializationData() const
 {
 	std::ostringstream os(std::ios::binary);
 	// version
@@ -658,7 +658,7 @@ std::string Oerkki1SAO::getClientInitializationData()
 	return os.str();
 }
 
-std::string Oerkki1SAO::getStaticData()
+std::string Oerkki1SAO::getStaticData() const
 {
 	//dstream<<__FUNCTION_NAME<<std::endl;
 	std::ostringstream os(std::ios::binary);
@@ -669,7 +669,7 @@ std::string Oerkki1SAO::getStaticData()
 	return os.str();
 }
 
-u16 Oerkki1SAO::punch(const std::string &toolname, v3f dir)
+u16 Oerkki1SAO::punch(const std::string &toolname, const v3f &dir)
 {
 	m_speed_f += dir*12*BS;
 
@@ -712,7 +712,7 @@ void Oerkki1SAO::doDamage(u16 d)
 // Prototype
 FireflySAO proto_FireflySAO(NULL, 0, v3f(0,0,0));
 
-FireflySAO::FireflySAO(ServerEnvironment *env, u16 id, v3f pos):
+FireflySAO::FireflySAO(ServerEnvironment *env, u16 id, const v3f &pos):
 	ServerActiveObject(env, id, pos),
 	m_is_active(false),
 	m_speed_f(0,0,0)
@@ -728,8 +728,8 @@ FireflySAO::FireflySAO(ServerEnvironment *env, u16 id, v3f pos):
 	m_touching_ground = false;
 }
 
-ServerActiveObject* FireflySAO::create(ServerEnvironment *env, u16 id, v3f pos,
-		const std::string &data)
+ServerActiveObject* FireflySAO::create(ServerEnvironment *env, u16 id,
+		const v3f &pos, const std::string &data)
 {
 	std::istringstream is(data, std::ios::binary);
 	char buf[1];
@@ -765,11 +765,11 @@ void FireflySAO::step(float dtime, bool send_recommended)
 	bool player_is_close = false;
 	// Check connected players
 	core::list<Player*> players = m_env->getPlayers(true);
-	core::list<Player*>::Iterator i;
+	core::list<Player*>::ConstIterator i;
 	for(i = players.begin();
 			i != players.end(); i++)
 	{
-		Player *player = *i;
+		const Player *player = *i;
 		v3f playerpos = player->getPosition();
 		if(m_base_position.getDistanceFrom(playerpos) < BS*10.0)
 		{
@@ -856,7 +856,7 @@ void FireflySAO::step(float dtime, bool send_recommended)
 	}
 }
 
-std::string FireflySAO::getClientInitializationData()
+std::string FireflySAO::getClientInitializationData() const
 {
 	std::ostringstream os(std::ios::binary);
 	// version
@@ -866,7 +866,7 @@ std::string FireflySAO::getClientInitializationData()
 	return os.str();
 }
 
-std::string FireflySAO::getStaticData()
+std::string FireflySAO::getStaticData() const
 {
 	//dstream<<__FUNCTION_NAME<<std::endl;
 	std::ostringstream os(std::ios::binary);
@@ -875,7 +875,7 @@ std::string FireflySAO::getStaticData()
 	return os.str();
 }
 
-InventoryItem* FireflySAO::createPickedUpItem()
+InventoryItem* FireflySAO::createPickedUpItem() const
 {
 	std::istringstream is("CraftItem firefly 1", std::ios_base::binary);
 	InventoryItem *item = InventoryItem::deSerialize(is);
