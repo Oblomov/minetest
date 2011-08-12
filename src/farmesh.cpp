@@ -404,7 +404,7 @@ void FarMesh::step(float dtime)
 	m_time += dtime;
 }
 
-void FarMesh::update(v2f camera_p, float brightness, s16 render_range)
+void FarMesh::update(const v2f &camera_p, float brightness, s16 render_range)
 {
 	m_camera_pos = camera_p;
 	m_brightness = brightness;
