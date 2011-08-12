@@ -63,13 +63,13 @@ public:
 	/*
 		peer_id=0 adds with nobody to send to
 	*/
-	void addBlock(v3s16 p, MeshMakeData *data, bool ack_block_to_server);
+	void addBlock(const v3s16 &p, MeshMakeData *data, bool ack_block_to_server);
 
 	// Returned pointer must be deleted
 	// Returns NULL if queue is empty
 	QueuedMeshUpdate * pop();
 
-	u32 size()
+	u32 size() const
 	{
 		JMutexAutoLock lock(m_mutex);
 		return m_queue.size();
@@ -77,7 +77,7 @@ public:
 	
 private:
 	core::list<QueuedMeshUpdate*> m_queue;
-	JMutex m_mutex;
+	mutable JMutex m_mutex;
 };
 
 struct MeshUpdateResult
@@ -151,7 +151,7 @@ public:
 		The name of the local player should already be set when
 		calling this, as it is sent in the initialization.
 	*/
-	void connect(Address address);
+	void connect(const Address &address);
 	/*
 		returns true when
 			m_con.Connected() == true
@@ -159,7 +159,7 @@ public:
 		throws con::PeerNotFoundException if connection has been deleted,
 		eg. timed out.
 	*/
-	bool connectedAndInitialized();
+	bool connectedAndInitialized() const;
 	/*
 		Stuff that references the environment is valid only as
 		long as this is not called. (eg. Players)
@@ -176,42 +176,43 @@ public:
 	// Returns true if something was received
 	bool AsyncProcessPacket();
 	bool AsyncProcessData();
-	void Send(u16 channelnum, SharedBuffer<u8> data, bool reliable);
+	void Send(u16 channelnum, const SharedBuffer<u8> &data, bool reliable) const;
 
 	// Pops out a packet from the packet queue
 	//IncomingPacket getPacket();
 
-	void groundAction(u8 action, v3s16 nodepos_undersurface,
-			v3s16 nodepos_oversurface, u16 item);
-	void clickObject(u8 button, v3s16 blockpos, s16 id, u16 item);
-	void clickActiveObject(u8 button, u16 id, u16 item);
+	void groundAction(u8 action, const v3s16 &nodepos_undersurface,
+			const v3s16 &nodepos_oversurface, u16 item) const;
+	void clickObject(u8 button, const v3s16 &blockpos, s16 id, u16 item) const;
+	void clickActiveObject(u8 button, u16 id, u16 item) const;
 
-	void sendSignText(v3s16 blockpos, s16 id, std::string text);
-	void sendSignNodeText(v3s16 p, std::string text);
-	void sendInventoryAction(InventoryAction *a);
-	void sendChatMessage(const std::wstring &message);
-	void sendChangePassword(const std::wstring oldpassword,
-		const std::wstring newpassword);
-	void sendDamage(u8 damage);
+	void sendSignText(const v3s16 &blockpos, s16 id,
+			const std::string &text) const;
+	void sendSignNodeText(const v3s16 &p, const std::string &text) const;
+	void sendInventoryAction(const InventoryAction *a) const;
+	void sendChatMessage(const std::wstring &message) const;
+	void sendChangePassword(const std::wstring &oldpassword,
+		const std::wstring &newpassword) const;
+	void sendDamage(u8 damage) const;
 	
 	// locks envlock
-	void removeNode(v3s16 p);
+	void removeNode(const v3s16 &p);
 	// locks envlock
-	void addNode(v3s16 p, MapNode n);
+	void addNode(const v3s16 &p, const MapNode &n);
 	
-	void updateCamera(v3f pos, v3f dir);
+	void updateCamera(const v3f &pos, const v3f &dir);
 	
 	// Returns InvalidPositionException if not found
-	MapNode getNode(v3s16 p);
+	const MapNode &getNode(const v3s16 &p) const;
 	// Wrapper to Map
 	const NodeMetadata* getNodeMetadata(const v3s16 &p) const;
 	NodeMetadata* getNodeMetadata(const v3s16 &p);
 
 	// Get the player position, and optionally put the
 	// eye position in *eye_position
-	v3f getPlayerPosition(v3f *eye_position=NULL);
+	const v3f &getPlayerPosition(v3f *eye_position=NULL) const;
 
-	void setPlayerControl(PlayerControl &control);
+	void setPlayerControl(const PlayerControl &control);
 
 	void selectPlayerItem(u16 item);
 
@@ -221,6 +222,7 @@ public:
 	// Copies the inventory of the local player to parameter
 	void getLocalInventory(Inventory &dst);
 	
+	const InventoryContext *getInventoryContext() const;
 	InventoryContext *getInventoryContext();
 
 	const Inventory* getInventory(InventoryContext *c, const std::string &id) const;
@@ -231,27 +233,27 @@ public:
 	// Returns NULL if not found
 	MapBlockObject * getSelectedObject(
 			f32 max_d,
-			v3f from_pos_f_on_map,
+			const v3f &from_pos_f_on_map,
 			core::line3d<f32> shootline_on_map
-	);
+	) const;
 
 	// Gets closest object pointed by the shootline
 	// Returns NULL if not found
 	ClientActiveObject * getSelectedActiveObject(
 			f32 max_d,
-			v3f from_pos_f_on_map,
+			const v3f &from_pos_f_on_map,
 			core::line3d<f32> shootline_on_map
 	);
 
 	// Prints a line or two of info
-	void printDebugInfo(std::ostream &os);
+	void printDebugInfo(std::ostream &os) const;
 
-	u32 getDayNightRatio();
+	u32 getDayNightRatio() const;
 
-	u16 getHP();
+	u16 getHP() const;
 
-	void setTempMod(v3s16 p, NodeMod mod);
-	void clearTempMod(v3s16 p);
+	void setTempMod(const v3s16 &p, const NodeMod &mod);
+	void clearTempMod(const v3s16 &p);
 
 	float getAvgRtt()
 	{
@@ -286,21 +288,21 @@ public:
 				(std::wstring)L"<"+name+L"> "+message);
 	}
 
-	u64 getMapSeed(){ return m_map_seed; }
+	u64 getMapSeed() const { return m_map_seed; }
 
-	void addUpdateMeshTask(v3s16 blockpos, bool ack_to_server=false);
+	void addUpdateMeshTask(const v3s16 &blockpos, bool ack_to_server=false);
 	// Including blocks at appropriate edges
-	void addUpdateMeshTaskWithEdge(v3s16 blockpos, bool ack_to_server=false);
+	void addUpdateMeshTaskWithEdge(const v3s16 &blockpos, bool ack_to_server=false);
 
 	// Get event from queue. CE_NONE is returned if queue is empty.
 	ClientEvent getClientEvent();
 	
-	inline bool accessDenied()
+	inline bool accessDenied() const
 	{
 		return m_access_denied;
 	}
 
-	inline std::wstring accessDeniedReason()
+	inline const std::wstring &accessDeniedReason() const
 	{
 		return m_access_denied_reason;
 	}
@@ -309,7 +311,7 @@ public:
 		This should only be used for calling the special drawing stuff in
 		ClientEnvironment
 	*/
-	ClientEnvironment * getEnv()
+	const ClientEnvironment * getEnv() const
 	{
 		return &m_env;
 	}
@@ -323,11 +325,11 @@ private:
 	void ReceiveAll();
 	void Receive();
 	
-	void sendPlayerPos();
+	void sendPlayerPos() const;
 	// This sends the player's current name etc to the server
-	void sendPlayerInfo();
+	void sendPlayerInfo() const;
 	// Send the item number 'item' as player item to the server
-	void sendPlayerItem(u16 item);
+	void sendPlayerItem(u16 item) const;
 	
 	float m_packetcounter_timer;
 	float m_connection_reinit_timer;
