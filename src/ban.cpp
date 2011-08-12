@@ -72,7 +72,7 @@ void BanManager::load()
 	m_modified = false;
 }
 
-void BanManager::save()
+void BanManager::save() const
 {
 	JMutexAutoLock lock(m_mutex);
 	dstream<<"BanManager: saving to "<<m_banfilepath<<std::endl;
@@ -84,7 +84,7 @@ void BanManager::save()
 		throw SerializationError("BanManager::load(): Couldn't open file");
 	}
 
-	for(std::map<std::string, std::string>::iterator
+	for(std::map<std::string, std::string>::const_iterator
 			i = m_ips.begin();
 			i != m_ips.end(); i++)
 	{
@@ -93,17 +93,17 @@ void BanManager::save()
 	m_modified = false;
 }
 
-bool BanManager::isIpBanned(const std::string &ip)
+bool BanManager::isIpBanned(const std::string &ip) const
 {
 	JMutexAutoLock lock(m_mutex);
 	return m_ips.find(ip) != m_ips.end();
 }
 
-std::string BanManager::getBanDescription(const std::string &ip_or_name)
+std::string BanManager::getBanDescription(const std::string &ip_or_name) const
 {
 	JMutexAutoLock lock(m_mutex);
 	std::string s = "";
-	for(std::map<std::string, std::string>::iterator
+	for(std::map<std::string, std::string>::const_iterator
 			i = m_ips.begin();
 			i != m_ips.end(); i++)
 	{
@@ -115,10 +115,10 @@ std::string BanManager::getBanDescription(const std::string &ip_or_name)
 	return s;
 }
 
-std::string BanManager::getBanName(const std::string &ip)
+std::string BanManager::getBanName(const std::string &ip) const
 {
 	JMutexAutoLock lock(m_mutex);
-	std::map<std::string, std::string>::iterator i = m_ips.find(ip);
+	std::map<std::string, std::string>::const_iterator i = m_ips.find(ip);
 	if(i == m_ips.end())
 		return "";
 	return i->second;
@@ -155,7 +155,7 @@ void BanManager::remove(const std::string &ip_or_name)
 }
 	
 
-bool BanManager::isModified()
+bool BanManager::isModified() const
 {
 	JMutexAutoLock lock(m_mutex);
 	return m_modified;

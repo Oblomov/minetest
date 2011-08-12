@@ -33,19 +33,19 @@ public:
 	BanManager(const std::string &bannfilepath);
 	~BanManager();
 	void load();
-	void save();
-	bool isIpBanned(const std::string &ip);
+	void save() const;
+	bool isIpBanned(const std::string &ip) const;
 	// Supplying ip_or_name = "" lists all bans.
-	std::string getBanDescription(const std::string &ip_or_name);
-	std::string getBanName(const std::string &ip);
+	std::string getBanDescription(const std::string &ip_or_name) const;
+	std::string getBanName(const std::string &ip) const;
 	void add(const std::string &ip, const std::string &name);
 	void remove(const std::string &ip_or_name);
-	bool isModified();
+	bool isModified() const;
 private:
-	JMutex m_mutex;
+	mutable JMutex m_mutex;
 	std::string m_banfilepath;
 	std::map<std::string, std::string> m_ips;
-	bool m_modified;
+	mutable bool m_modified;
 
 };
 
