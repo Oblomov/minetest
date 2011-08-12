@@ -204,7 +204,8 @@ public:
 	// Returns InvalidPositionException if not found
 	MapNode getNode(v3s16 p);
 	// Wrapper to Map
-	NodeMetadata* getNodeMetadata(v3s16 p);
+	const NodeMetadata* getNodeMetadata(const v3s16 &p) const;
+	NodeMetadata* getNodeMetadata(const v3s16 &p);
 
 	// Get the player position, and optionally put the
 	// eye position in *eye_position
@@ -222,6 +223,7 @@ public:
 	
 	InventoryContext *getInventoryContext();
 
+	const Inventory* getInventory(InventoryContext *c, const std::string &id) const;
 	Inventory* getInventory(InventoryContext *c, const std::string &id);
 	void inventoryAction(InventoryAction *a);
 

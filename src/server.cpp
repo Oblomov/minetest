@@ -3457,6 +3457,35 @@ void Server::onMapEditEvent(MapEditEvent *event)
 	m_unsent_map_edit_queue.push_back(e);
 }
 
+const Inventory* Server::getInventory(InventoryContext *c, const std::string &id) const
+{
+	if(id == "current_player")
+	{
+		assert(c->current_player);
+		return &(c->current_player->inventory);
+	}
+	
+	Strfnd fn(id);
+	std::string id0 = fn.next(":");
+
+	if(id0 == "nodemeta")
+	{
+		v3s16 p;
+		p.X = stoi(fn.next(","));
+		p.Y = stoi(fn.next(","));
+		p.Z = stoi(fn.next(","));
+		const NodeMetadata *meta = m_env.getMap().getNodeMetadata(p);
+		if(meta)
+			return meta->getInventory();
+		dstream<<"nodemeta at ("<<p.X<<","<<p.Y<<","<<p.Z<<"): "
+				<<"no metadata found"<<std::endl;
+		return NULL;
+	}
+
+	dstream<<__FUNCTION_NAME<<": unknown id "<<id<<std::endl;
+	return NULL;
+}
+
 Inventory* Server::getInventory(InventoryContext *c, const std::string &id)
 {
 	if(id == "current_player")

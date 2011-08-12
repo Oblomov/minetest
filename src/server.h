@@ -411,7 +411,10 @@ public:
 	/*
 		Shall be called with the environment and the connection locked.
 	*/
-	Inventory* getInventory(InventoryContext *c, const std::string &id);
+	const Inventory* getInventory(InventoryContext *c,
+			const std::string &id) const;
+	Inventory* getInventory(InventoryContext *c,
+			const std::string &id);
 	void inventoryModified(InventoryContext *c, const std::string &id);
 
 	// Connection must be locked when called

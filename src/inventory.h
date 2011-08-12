@@ -572,6 +572,9 @@ public:
 		- "current_player"
 		- "nodemeta:X,Y,Z"
 	*/
+	virtual const Inventory* getInventory(InventoryContext *c,
+			const std::string &id) const
+		{return NULL;}
 	virtual Inventory* getInventory(InventoryContext *c,
 			const std::string &id)
 		{return NULL;}

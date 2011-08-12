@@ -1993,7 +1993,12 @@ MapNode Client::getNode(v3s16 p)
 	return m_env.getMap().getNode(p);
 }
 
-NodeMetadata* Client::getNodeMetadata(v3s16 p)
+const NodeMetadata* Client::getNodeMetadata(const v3s16 &p) const
+{
+	return m_env.getMap().getNodeMetadata(p);
+}
+
+NodeMetadata* Client::getNodeMetadata(const v3s16 &p)
 {
 	return m_env.getMap().getNodeMetadata(p);
 }
@@ -2049,6 +2054,35 @@ void Client::getLocalInventory(Inventory &dst)
 InventoryContext *Client::getInventoryContext()
 {
 	return &m_inventory_context;
+}
+
+const Inventory* Client::getInventory(InventoryContext *c, const std::string &id) const
+{
+	if(id == "current_player")
+	{
+		assert(c->current_player);
+		return &(c->current_player->inventory);
+	}
+	
+	Strfnd fn(id);
+	std::string id0 = fn.next(":");
+
+	if(id0 == "nodemeta")
+	{
+		v3s16 p;
+		p.X = stoi(fn.next(","));
+		p.Y = stoi(fn.next(","));
+		p.Z = stoi(fn.next(","));
+		const NodeMetadata* meta = getNodeMetadata(p);
+		if(meta)
+			return meta->getInventory();
+		dstream<<"nodemeta at ("<<p.X<<","<<p.Y<<","<<p.Z<<"): "
+				<<"no metadata found"<<std::endl;
+		return NULL;
+	}
+
+	dstream<<__FUNCTION_NAME<<": unknown id "<<id<<std::endl;
+	return NULL;
 }
 
 Inventory* Client::getInventory(InventoryContext *c, const std::string &id)
