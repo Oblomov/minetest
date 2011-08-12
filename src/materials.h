@@ -67,7 +67,7 @@ public:
 		m_digging_properties[toolname] = prop;
 	}
 
-	DiggingProperties get(const std::string toolname)
+	DiggingProperties get(const std::string &toolname) const
 	{
 		core::map<std::string, DiggingProperties>::Node *n;
 		n = m_digging_properties.find(toolname);
