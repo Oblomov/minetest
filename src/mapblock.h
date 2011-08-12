@@ -127,6 +127,10 @@ public:
 		return NODECONTAINER_ID_MAPBLOCK;
 	}*/
 	
+	const Map * getParent() const
+	{
+		return m_parent;
+	}
 	Map * getParent()
 	{
 		return m_parent;
@@ -149,7 +153,7 @@ public:
 		Flags
 	*/
 
-	bool isDummy()
+	bool isDummy() const
 	{
 		return (data == NULL);
 	}
@@ -171,13 +175,13 @@ public:
 		raiseModified(MOD_STATE_WRITE_NEEDED);
 	}
 	// DEPRECATED, use *Modified()
-	void resetChangedFlag()
+	void resetChangedFlag() const
 	{
 		//dstream<<"Deprecated resetChangedFlag() called"<<std::endl;
 		resetModified();
 	}
 	// DEPRECATED, use *Modified()
-	bool getChangedFlag()
+	bool getChangedFlag() const
 	{
 		//dstream<<"Deprecated getChangedFlag() called"<<std::endl;
 		if(getModified() == MOD_STATE_CLEAN)
@@ -191,17 +195,17 @@ public:
 	{
 		m_modified = MYMAX(m_modified, mod);
 	}
-	u32 getModified()
+	u32 getModified() const
 	{
 		return m_modified;
 	}
-	void resetModified()
+	void resetModified() const
 	{
 		m_modified = MOD_STATE_CLEAN;
 	}
 	
 	// is_underground getter/setter
-	bool getIsUnderground()
+	bool getIsUnderground() const
 	{
 		return is_underground;
 	}
@@ -217,7 +221,7 @@ public:
 		m_mesh_expired = expired;
 	}
 	
-	bool getMeshExpired()
+	bool getMeshExpired() const
 	{
 		return m_mesh_expired;
 	}
@@ -228,12 +232,12 @@ public:
 		m_lighting_expired = expired;
 		raiseModified(MOD_STATE_WRITE_NEEDED);
 	}
-	bool getLightingExpired()
+	bool getLightingExpired() const
 	{
 		return m_lighting_expired;
 	}
 
-	bool isGenerated()
+	bool isGenerated() const
 	{
 		return m_generated;
 	}
@@ -243,7 +247,7 @@ public:
 		m_generated = b;
 	}
 
-	bool isValid()
+	bool isValid() const
 	{
 		if(m_lighting_expired)
 			return false;
@@ -256,17 +260,17 @@ public:
 		Position stuff
 	*/
 
-	v3s16 getPos()
+	const v3s16 &getPos() const
 	{
 		return m_pos;
 	}
 		
-	v3s16 getPosRelative()
+	v3s16 getPosRelative() const
 	{
 		return m_pos * MAP_BLOCKSIZE;
 	}
 		
-	core::aabbox3d<s16> getBox()
+	core::aabbox3d<s16> getBox() const
 	{
 		return core::aabbox3d<s16>(getPosRelative(),
 				getPosRelative()
@@ -278,7 +282,7 @@ public:
 		Regular MapNode get-setters
 	*/
 	
-	bool isValidPosition(v3s16 p)
+	bool isValidPosition(const v3s16 &p) const
 	{
 		if(data == NULL)
 			return false;
@@ -287,7 +291,7 @@ public:
 				&& p.Z >= 0 && p.Z < MAP_BLOCKSIZE);
 	}
 
-	MapNode getNode(s16 x, s16 y, s16 z)
+	const MapNode &getNode(s16 x, s16 y, s16 z) const
 	{
 		if(data == NULL)
 			throw InvalidPositionException();
@@ -297,12 +301,12 @@ public:
 		return data[z*MAP_BLOCKSIZE*MAP_BLOCKSIZE + y*MAP_BLOCKSIZE + x];
 	}
 	
-	MapNode getNode(v3s16 p)
+	const MapNode &getNode(const v3s16 &p) const
 	{
 		return getNode(p.X, p.Y, p.Z);
 	}
 	
-	MapNode getNodeNoEx(v3s16 p)
+	MapNode getNodeNoEx(const v3s16 &p) const
 	{
 		try{
 			return getNode(p.X, p.Y, p.Z);
@@ -311,7 +315,7 @@ public:
 		}
 	}
 	
-	void setNode(s16 x, s16 y, s16 z, MapNode & n)
+	void setNode(s16 x, s16 y, s16 z, const MapNode & n)
 	{
 		if(data == NULL)
 			throw InvalidPositionException();
@@ -322,7 +326,7 @@ public:
 		raiseModified(MOD_STATE_WRITE_NEEDED);
 	}
 	
-	void setNode(v3s16 p, MapNode & n)
+	void setNode(const v3s16 &p, const MapNode & n)
 	{
 		setNode(p.X, p.Y, p.Z, n);
 	}
@@ -331,19 +335,19 @@ public:
 		Non-checking variants of the above
 	*/
 
-	MapNode getNodeNoCheck(s16 x, s16 y, s16 z)
+	const MapNode &getNodeNoCheck(s16 x, s16 y, s16 z) const
 	{
 		if(data == NULL)
 			throw InvalidPositionException();
 		return data[z*MAP_BLOCKSIZE*MAP_BLOCKSIZE + y*MAP_BLOCKSIZE + x];
 	}
 	
-	MapNode getNodeNoCheck(v3s16 p)
+	const MapNode &getNodeNoCheck(const v3s16 &p) const
 	{
 		return getNodeNoCheck(p.X, p.Y, p.Z);
 	}
 	
-	void setNodeNoCheck(s16 x, s16 y, s16 z, MapNode & n)
+	void setNodeNoCheck(s16 x, s16 y, s16 z, const MapNode & n)
 	{
 		if(data == NULL)
 			throw InvalidPositionException();
@@ -351,7 +355,7 @@ public:
 		raiseModified(MOD_STATE_WRITE_NEEDED);
 	}
 	
-	void setNodeNoCheck(v3s16 p, MapNode & n)
+	void setNodeNoCheck(const v3s16 &p, const MapNode & n)
 	{
 		setNodeNoCheck(p.X, p.Y, p.Z, n);
 	}
@@ -360,12 +364,13 @@ public:
 		These functions consult the parent container if the position
 		is not valid on this MapBlock.
 	*/
-	bool isValidPositionParent(v3s16 p);
-	MapNode getNodeParent(v3s16 p);
-	void setNodeParent(v3s16 p, MapNode & n);
-	MapNode getNodeParentNoEx(v3s16 p);
+	bool isValidPositionParent(const v3s16 &p) const;
+	const MapNode &getNodeParent(const v3s16 &p) const;
+	void setNodeParent(const v3s16 &p, const MapNode & n);
+	MapNode getNodeParentNoEx(const v3s16 &p) const;
 
-	void drawbox(s16 x0, s16 y0, s16 z0, s16 w, s16 h, s16 d, MapNode node)
+	void drawbox(s16 x0, s16 y0, s16 z0, s16 w, s16 h, s16 d,
+			const MapNode &node)
 	{
 		for(u16 z=0; z<d; z++)
 			for(u16 y=0; y<h; y++)
@@ -388,7 +393,7 @@ public:
 				getNodeParentNoEx(p + face_dir),
 				face_dir);
 	}*/
-	u8 getFaceLight2(u32 daynight_ratio, v3s16 p, v3s16 face_dir)
+	u8 getFaceLight2(u32 daynight_ratio, v3s16 p, const v3s16 &face_dir) const
 	{
 		return getFaceLight(daynight_ratio,
 				getNodeParentNoEx(p),
@@ -415,9 +420,9 @@ public:
 			bool remove_light=false, bool *black_air_left=NULL);
 	
 	// Copies data to VoxelManipulator to getPosRelative()
-	void copyTo(VoxelManipulator &dst);
+	void copyTo(VoxelManipulator &dst) const;
 	// Copies data from VoxelManipulator getPosRelative()
-	void copyFrom(VoxelManipulator &dst);
+	void copyFrom(const VoxelManipulator &dst);
 
 	/*
 		MapBlockObject stuff
@@ -475,12 +480,12 @@ public:
 
 	// origin is relative to block
 	void getObjects(v3f origin, f32 max_d,
-			core::array<DistanceSortedObject> &dest)
+			core::array<DistanceSortedObject> &dest) const
 	{
 		m_objects.getObjects(origin, max_d, dest);
 	}
 
-	s32 getObjectCount()
+	s32 getObjectCount() const
 	{
 		return m_objects.getCount();
 	}
@@ -492,7 +497,7 @@ public:
 
 		returns true if the mod was different last time
 	*/
-	bool setTempMod(v3s16 p, const NodeMod &mod)
+	bool setTempMod(const v3s16 &p, const NodeMod &mod)
 	{
 		/*dstream<<"setTempMod called on block"
 				<<" ("<<p.X<<","<<p.Y<<","<<p.Z<<")"
@@ -504,13 +509,13 @@ public:
 		return m_temp_mods.set(p, mod);
 	}
 	// Returns true if there was one
-	bool getTempMod(v3s16 p, NodeMod *mod)
+	bool getTempMod(const v3s16 &p, NodeMod *mod) const
 	{
 		JMutexAutoLock lock(m_temp_mods_mutex);
 
 		return m_temp_mods.get(p, mod);
 	}
-	bool clearTempMod(v3s16 p)
+	bool clearTempMod(const v3s16 &p)
 	{
 		JMutexAutoLock lock(m_temp_mods_mutex);
 
@@ -522,7 +527,7 @@ public:
 		
 		return m_temp_mods.clear();
 	}
-	void copyTempMods(NodeModMap &dst)
+	void copyTempMods(NodeModMap &dst) const
 	{
 		JMutexAutoLock lock(m_temp_mods_mutex);
 		m_temp_mods.copy(dst);
@@ -541,7 +546,7 @@ public:
 	*/
 	void updateDayNightDiff();
 
-	bool dayNightDiffed()
+	bool dayNightDiffed() const
 	{
 		return m_day_night_differs;
 	}
@@ -558,7 +563,7 @@ public:
 			-3 = random fail
 			0...MAP_BLOCKSIZE-1 = ground level
 	*/
-	s16 getGroundLevel(v2s16 p2d);
+	s16 getGroundLevel(const v2s16 &p2d) const;
 
 	/*
 		Timestamp (see m_timestamp)
@@ -573,7 +578,7 @@ public:
 	{
 		m_timestamp = time;
 	}
-	u32 getTimestamp()
+	u32 getTimestamp() const
 	{
 		return m_timestamp;
 	}
@@ -589,7 +594,7 @@ public:
 	{
 		m_usage_timer += dtime;
 	}
-	u32 getUsageTimer()
+	u32 getUsageTimer() const
 	{
 		return m_usage_timer;
 	}
@@ -599,10 +604,10 @@ public:
 	*/
 	
 	// These don't write or read version by itself
-	void serialize(std::ostream &os, u8 version);
+	void serialize(std::ostream &os, u8 version) const;
 	void deSerialize(std::istream &is, u8 version);
 	// Used after the basic ones when writing on disk (serverside)
-	void serializeDiskExtra(std::ostream &os, u8 version);
+	void serializeDiskExtra(std::ostream &os, u8 version) const;
 	void deSerializeDiskExtra(std::istream &is, u8 version);
 
 private:
@@ -623,7 +628,20 @@ private:
 		if(z < 0 || z >= MAP_BLOCKSIZE) throw InvalidPositionException();
 		return data[z*MAP_BLOCKSIZE*MAP_BLOCKSIZE + y*MAP_BLOCKSIZE + x];
 	}
-	MapNode & getNodeRef(v3s16 &p)
+	const MapNode & getNodeRef(s16 x, s16 y, s16 z) const
+	{
+		if(data == NULL)
+			throw InvalidPositionException();
+		if(x < 0 || x >= MAP_BLOCKSIZE) throw InvalidPositionException();
+		if(y < 0 || y >= MAP_BLOCKSIZE) throw InvalidPositionException();
+		if(z < 0 || z >= MAP_BLOCKSIZE) throw InvalidPositionException();
+		return data[z*MAP_BLOCKSIZE*MAP_BLOCKSIZE + y*MAP_BLOCKSIZE + x];
+	}
+	MapNode & getNodeRef(const v3s16 &p)
+	{
+		return getNodeRef(p.X, p.Y, p.Z);
+	}
+	const MapNode & getNodeRef(const v3s16 &p) const
 	{
 		return getNodeRef(p.X, p.Y, p.Z);
 	}
@@ -635,7 +653,7 @@ public:
 
 #ifndef SERVER // Only on client
 	scene::SMesh *mesh;
-	JMutex mesh_mutex;
+	mutable JMutex mesh_mutex;
 #endif
 	
 	NodeMetadataList m_node_metadata;
@@ -662,7 +680,7 @@ private:
 		  block has been modified from the one on disk.
 		- On the client, this is used for nothing.
 	*/
-	u32 m_modified;
+	mutable u32 m_modified;
 
 	/*
 		When propagating sunlight and the above block doesn't exist,
@@ -702,7 +720,7 @@ private:
 	// Temporary modifications to nodes
 	// These are only used when drawing
 	NodeModMap m_temp_mods;
-	JMutex m_temp_mods_mutex;
+	mutable JMutex m_temp_mods_mutex;
 #endif
 	
 	/*
@@ -718,7 +736,7 @@ private:
 	float m_usage_timer;
 };
 
-inline bool blockpos_over_limit(v3s16 p)
+inline bool blockpos_over_limit(const v3s16 &p)
 {
 	return
 	  (p.X < -MAP_GENERATION_LIMIT / MAP_BLOCKSIZE
@@ -732,12 +750,12 @@ inline bool blockpos_over_limit(v3s16 p)
 /*
 	Returns the position of the block where the node is located
 */
-inline v3s16 getNodeBlockPos(v3s16 p)
+inline v3s16 getNodeBlockPos(const v3s16 &p)
 {
 	return getContainerPos(p, MAP_BLOCKSIZE);
 }
 
-inline v2s16 getNodeSectorPos(v2s16 p)
+inline v2s16 getNodeSectorPos(const v2s16 &p)
 {
 	return getContainerPos(p, MAP_BLOCKSIZE);
 }
@@ -750,7 +768,7 @@ inline s16 getNodeBlockY(s16 y)
 /*
 	Get a quick string to describe what a block actually contains
 */
-std::string analyze_block(MapBlock *block);
+std::string analyze_block(const MapBlock *block);
 
 #endif
 

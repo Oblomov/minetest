@@ -72,7 +72,7 @@ MapBlock::~MapBlock()
 		delete[] data;
 }
 
-bool MapBlock::isValidPositionParent(v3s16 p)
+bool MapBlock::isValidPositionParent(const v3s16 &p) const
 {
 	if(isValidPosition(p))
 	{
@@ -83,7 +83,7 @@ bool MapBlock::isValidPositionParent(v3s16 p)
 	}
 }
 
-MapNode MapBlock::getNodeParent(v3s16 p)
+const MapNode &MapBlock::getNodeParent(const v3s16 &p) const
 {
 	if(isValidPosition(p) == false)
 	{
@@ -97,7 +97,7 @@ MapNode MapBlock::getNodeParent(v3s16 p)
 	}
 }
 
-void MapBlock::setNodeParent(v3s16 p, MapNode & n)
+void MapBlock::setNodeParent(const v3s16 &p, const MapNode & n)
 {
 	if(isValidPosition(p) == false)
 	{
@@ -111,7 +111,7 @@ void MapBlock::setNodeParent(v3s16 p, MapNode & n)
 	}
 }
 
-MapNode MapBlock::getNodeParentNoEx(v3s16 p)
+MapNode MapBlock::getNodeParentNoEx(const v3s16 &p) const
 {
 	if(isValidPosition(p) == false)
 	{
@@ -414,7 +414,7 @@ bool MapBlock::propagateSunlight(core::map<v3s16, bool> & light_sources,
 }
 
 
-void MapBlock::copyTo(VoxelManipulator &dst)
+void MapBlock::copyTo(VoxelManipulator &dst) const
 {
 	v3s16 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
 	VoxelArea data_area(v3s16(0,0,0), data_size - v3s16(1,1,1));
@@ -424,7 +424,7 @@ void MapBlock::copyTo(VoxelManipulator &dst)
 			getPosRelative(), data_size);
 }
 
-void MapBlock::copyFrom(VoxelManipulator &dst)
+void MapBlock::copyFrom(const VoxelManipulator &dst)
 {
 	v3s16 data_size(MAP_BLOCKSIZE, MAP_BLOCKSIZE, MAP_BLOCKSIZE);
 	VoxelArea data_area(v3s16(0,0,0), data_size - v3s16(1,1,1));
@@ -492,7 +492,7 @@ void MapBlock::updateDayNightDiff()
 	m_day_night_differs = differs;
 }
 
-s16 MapBlock::getGroundLevel(v2s16 p2d)
+s16 MapBlock::getGroundLevel(const v2s16 &p2d) const
 {
 	if(isDummy())
 		return -3;
@@ -501,7 +501,7 @@ s16 MapBlock::getGroundLevel(v2s16 p2d)
 		s16 y = MAP_BLOCKSIZE-1;
 		for(; y>=0; y--)
 		{
-			MapNode n = getNodeRef(p2d.X, y, p2d.Y);
+			const MapNode &n = getNodeRef(p2d.X, y, p2d.Y);
 			if(content_features(n).walkable)
 			{
 				if(y == MAP_BLOCKSIZE-1)
@@ -522,7 +522,7 @@ s16 MapBlock::getGroundLevel(v2s16 p2d)
 	Serialization
 */
 
-void MapBlock::serialize(std::ostream &os, u8 version)
+void MapBlock::serialize(std::ostream &os, u8 version) const
 {
 	if(!ser_ver_supported(version))
 		throw VersionMismatchException("ERROR: MapBlock format not supported");
@@ -815,7 +815,7 @@ void MapBlock::deSerialize(std::istream &is, u8 version)
 	}
 }
 
-void MapBlock::serializeDiskExtra(std::ostream &os, u8 version)
+void MapBlock::serializeDiskExtra(std::ostream &os, u8 version) const
 {
 	// Versions up from 9 have block objects.
 	if(version >= 9)
@@ -870,7 +870,7 @@ void MapBlock::deSerializeDiskExtra(std::istream &is, u8 version)
 /*
 	Get a quick string to describe what a block actually contains
 */
-std::string analyze_block(MapBlock *block)
+std::string analyze_block(const MapBlock *block)
 {
 	if(block == NULL)
 	{

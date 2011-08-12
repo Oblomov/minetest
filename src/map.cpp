@@ -181,7 +181,7 @@ MapNode Map::getNode(v3s16 p)
 }
 
 // throws InvalidPositionException if not found
-void Map::setNode(v3s16 p, MapNode & n)
+void Map::setNode(const v3s16 &p, const MapNode & n)
 {
 	v3s16 blockpos = getNodeBlockPos(p);
 	MapBlock *block = getBlockNoCreate(blockpos);

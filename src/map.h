@@ -161,7 +161,7 @@ public:
 	MapNode getNode(v3s16 p);
 
 	// throws InvalidPositionException if not found
-	void setNode(v3s16 p, MapNode & n);
+	void setNode(const v3s16 &p, const MapNode & n);
 	
 	// Returns a CONTENT_IGNORE node if not found
 	MapNode getNodeNoEx(v3s16 p);
