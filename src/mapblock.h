@@ -455,11 +455,15 @@ public:
 
 		raiseModified(MOD_STATE_WRITE_NEEDED);
 	}
+	const MapBlockObject * getObject(s16 id) const
+	{
+		return m_objects.get(id);
+	}
 	MapBlockObject * getObject(s16 id)
 	{
 		return m_objects.get(id);
 	}
-	JMutexAutoLock * getObjectLock()
+	const JMutexAutoLock * getObjectLock() const
 	{
 		return m_objects.getLock();
 	}

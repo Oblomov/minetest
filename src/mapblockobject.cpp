@@ -32,7 +32,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 // This is here because it uses the MapBlock
-v3f MapBlockObject::getAbsolutePos()
+v3f MapBlockObject::getAbsolutePos() const
 {
 	if(m_block == NULL)
 		return m_pos;
@@ -52,7 +52,7 @@ void MapBlockObject::setBlockChanged()
 	MovingObject
 */
 
-v3f MovingObject::getAbsoluteShowPos()
+v3f MovingObject::getAbsoluteShowPos() const
 {
 	if(m_block == NULL)
 		return m_pos;
@@ -62,7 +62,7 @@ v3f MovingObject::getAbsoluteShowPos()
 	return blockpos + m_showpos;
 }
 
-void MovingObject::move(float dtime, v3f acceleration)
+void MovingObject::move(float dtime, const v3f &acceleration)
 {
 	DSTACKF("%s: typeid=%i, pos=(%f,%f,%f), speed=(%f,%f,%f)"
 			", dtime=%f, acc=(%f,%f,%f)",
@@ -352,7 +352,7 @@ void ItemObject::addToScene(scene::ISceneManager *smgr)
 	updateSceneNode();
 }
 
-video::ITexture * ItemObject::getItemImage()
+video::ITexture * ItemObject::getItemImage() const
 {
 	/*
 		Create an inventory item to see what is its image
@@ -368,7 +368,7 @@ video::ITexture * ItemObject::getItemImage()
 
 #endif
 
-InventoryItem * ItemObject::createInventoryItem()
+InventoryItem * ItemObject::createInventoryItem() const
 {
 	try{
 		std::istringstream is(m_itemstring, std::ios_base::binary);
@@ -474,7 +474,7 @@ MapBlockObjectList::~MapBlockObjectList()
 	[2] entries (id, typeId, parameters)
 */
 
-void MapBlockObjectList::serialize(std::ostream &os, u8 version)
+void MapBlockObjectList::serialize(std::ostream &os, u8 version) const
 {
 	JMutexAutoLock lock(m_mutex);
 
@@ -482,8 +482,8 @@ void MapBlockObjectList::serialize(std::ostream &os, u8 version)
 	writeU16(buf, m_objects.size());
 	os.write((char*)buf, 2);
 
-	for(core::map<s16, MapBlockObject*>::Iterator
-			i = m_objects.getIterator();
+	for(core::map<s16, MapBlockObject*>::ConstIterator
+			i = m_objects.getConstIterator();
 			i.atEnd() == false; i++)
 	{
 		i.getNode()->getValue()->serialize(os, version);
@@ -737,6 +737,16 @@ void MapBlockObjectList::remove(s16 id)
 	m_objects.remove(id);
 }
 
+const MapBlockObject * MapBlockObjectList::get(s16 id) const
+{
+	core::map<s16, MapBlockObject*>::Node *n;
+	n = m_objects.find(id);
+	if(n == NULL)
+		return NULL;
+	else
+		return n->getValue();
+}
+
 MapBlockObject * MapBlockObjectList::get(s16 id)
 {
 	core::map<s16, MapBlockObject*>::Node *n;
@@ -916,11 +926,11 @@ bool MapBlockObjectList::wrapObject(MapBlockObject *object)
 	return false;
 }
 
-void MapBlockObjectList::getObjects(v3f origin, f32 max_d,
-		core::array<DistanceSortedObject> &dest)
+void MapBlockObjectList::getObjects(const v3f &origin, f32 max_d,
+		core::array<DistanceSortedObject> &dest) const
 {
-	for(core::map<s16, MapBlockObject*>::Iterator
-			i = m_objects.getIterator();
+	for(core::map<s16, MapBlockObject*>::ConstIterator
+			i = m_objects.getConstIterator();
 			i.atEnd() == false; i++)
 	{
 		MapBlockObject *obj = i.getNode()->getValue();

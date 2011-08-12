@@ -42,7 +42,7 @@ class MapBlock;
 class MapBlockObject
 {
 public:
-	MapBlockObject(MapBlock *block, s16 id, v3f pos):
+	MapBlockObject(MapBlock *block, s16 id, const v3f &pos):
 		m_collision_box(NULL),
 		m_selection_box(NULL),
 		m_block(block),
@@ -54,17 +54,21 @@ public:
 	{
 	}
 
-	s16 getId()
+	s16 getId() const
 	{
 		return m_id;
+	}
+	const MapBlock* getBlock() const
+	{
+		return m_block;
 	}
 	MapBlock* getBlock()
 	{
 		return m_block;
 	}
-	
+
 	// Writes id, pos and typeId
-	void serializeBase(std::ostream &os, u8 version)
+	void serializeBase(std::ostream &os, u8 version) const
 	{
 		u8 buf[6];
 
@@ -84,17 +88,17 @@ public:
 	}
 	
 	// Position where the object is drawn relative to block
-	virtual v3f getRelativeShowPos()
+	virtual v3f getRelativeShowPos() const
 	{
 		return m_pos;
 	}
 	// Get floating point position on map
-	v3f getAbsolutePos();
+	v3f getAbsolutePos() const;
 
 	void setBlockChanged();
 
 	// Shootline is relative to block
-	bool isSelected(core::line3d<f32> shootline)
+	bool isSelected(core::line3d<f32> shootline) const
 	{
 		if(m_selection_box == NULL)
 			return false;
@@ -107,7 +111,7 @@ public:
 		return offsetted_box.intersectsWithLine(shootline);
 	}
 
-	core::aabbox3d<f32> getSelectionBoxOnMap()
+	core::aabbox3d<f32> getSelectionBoxOnMap() const
 	{
 		v3f absolute_pos = getAbsolutePos();
 
@@ -125,14 +129,14 @@ public:
 
 	virtual u16 getTypeId() const = 0;
 	// Shall call serializeBase and then write the parameters
-	virtual void serialize(std::ostream &os, u8 version) = 0;
+	virtual void serialize(std::ostream &os, u8 version) const = 0;
 	// Shall read parameters from stream
 	virtual void update(std::istream &is, u8 version) = 0;
 
-	virtual std::string getInventoryString() { return "None"; }
+	virtual std::string getInventoryString() const { return "None"; }
 	
 	// Reimplementation shall call this.
-	virtual void updatePos(v3f pos)
+	virtual void updatePos(const v3f &pos)
 	{
 		m_pos = pos;
 	}
@@ -167,7 +171,7 @@ public:
 	virtual void updateLight(u8 light_at_pos) {};
 #endif
 
-	virtual std::string infoText() { return ""; }
+	virtual std::string infoText() const { return ""; }
 	
 	// Shall be left NULL if doesn't collide
 	// Position is relative to m_pos in block
@@ -243,7 +247,7 @@ class MovingObject : public MapBlockObject
 {
 public:
 	// The constructor of every MapBlockObject should be like this
-	MovingObject(MapBlock *block, s16 id, v3f pos):
+	MovingObject(MapBlock *block, s16 id, const v3f &pos):
 		MapBlockObject(block, id, pos),
 		m_speed(0,0,0),
 		m_oldpos(pos),
@@ -262,7 +266,7 @@ public:
 	
 	virtual u16 getTypeId() const = 0;
 
-	virtual void serialize(std::ostream &os, u8 version)
+	virtual void serialize(std::ostream &os, u8 version) const
 	{
 		serializeBase(os, version);
 
@@ -290,7 +294,7 @@ public:
 	}
 	
 	// Reimplementation shall call this.
-	virtual void updatePos(v3f pos)
+	virtual void updatePos(const v3f &pos)
 	{
 		m_oldpos = m_showpos;
 		m_pos = pos;
@@ -305,12 +309,12 @@ public:
 	}
 	
 	// Position where the object is drawn relative to block
-	virtual v3f getRelativeShowPos()
+	virtual v3f getRelativeShowPos() const
 	{
 		return m_showpos;
 	}
 	// Returns m_showpos relative to whole map
-	v3f getAbsoluteShowPos();
+	v3f getAbsoluteShowPos() const;
 
 	virtual bool serverStep(float dtime, u32 daynight_ratio)
 	{ return false; };
@@ -325,7 +329,7 @@ public:
 	*/
 	
 	// Move with collision detection, server side
-	void move(float dtime, v3f acceleration);
+	void move(float dtime, const v3f &acceleration);
 
 	// Move from old position to new position, client side
 	void simpleMove(float dtime);
@@ -345,7 +349,7 @@ class SignObject : public MapBlockObject
 {
 public:
 	// The constructor of every MapBlockObject should be like this
-	SignObject(MapBlock *block, s16 id, v3f pos):
+	SignObject(MapBlock *block, s16 id, const v3f &pos):
 		MapBlockObject(block, id, pos),
 		m_node(NULL)
 	{
@@ -364,7 +368,7 @@ public:
 	{
 		return MAPBLOCKOBJECT_TYPE_SIGN;
 	}
-	virtual void serialize(std::ostream &os, u8 version)
+	virtual void serialize(std::ostream &os, u8 version) const
 	{
 		serializeBase(os, version);
 		u8 buf[2];
@@ -501,12 +505,12 @@ public:
 	}
 #endif
 
-	virtual std::string infoText()
+	virtual std::string infoText() const
 	{
 		return std::string("\"") + m_text + "\"";
 	}
 
-	virtual std::string getInventoryString()
+	virtual std::string getInventoryString() const
 	{
 		return std::string("Sign ")+m_text;
 	}
@@ -534,7 +538,7 @@ public:
 		setBlockChanged();
 	}
 
-	std::string getText()
+	std::string getText() const
 	{
 		return m_text;
 	}
@@ -555,7 +559,7 @@ protected:
 class RatObject : public MovingObject
 {
 public:
-	RatObject(MapBlock *block, s16 id, v3f pos):
+	RatObject(MapBlock *block, s16 id, const v3f &pos):
 		MovingObject(block, id, pos),
 		m_node(NULL)
 	{
@@ -582,7 +586,7 @@ public:
 	{
 		return MAPBLOCKOBJECT_TYPE_RAT;
 	}
-	virtual void serialize(std::ostream &os, u8 version)
+	virtual void serialize(std::ostream &os, u8 version) const
 	{
 		MovingObject::serialize(os, version);
 		u8 buf[2];
@@ -694,7 +698,7 @@ public:
 	
 #endif
 
-	virtual std::string getInventoryString()
+	virtual std::string getInventoryString() const
 	{
 		// There must be a space after the name
 		// Or does there?
@@ -733,7 +737,7 @@ class ItemObject : public MapBlockObject
 {
 public:
 	// The constructor of every MapBlockObject should be like this
-	ItemObject(MapBlock *block, s16 id, v3f pos):
+	ItemObject(MapBlock *block, s16 id, const v3f &pos):
 		MapBlockObject(block, id, pos),
 		m_node(NULL)
 	{
@@ -755,7 +759,7 @@ public:
 	{
 		return MAPBLOCKOBJECT_TYPE_ITEM;
 	}
-	virtual void serialize(std::ostream &os, u8 version)
+	virtual void serialize(std::ostream &os, u8 version) const
 	{
 		serializeBase(os, version);
 		u8 buf[2];
@@ -853,12 +857,12 @@ public:
 	}
 #endif
 
-	virtual std::string infoText()
+	virtual std::string infoText() const
 	{
 		return std::string("\"") + m_itemstring + "\"";
 	}
 
-	virtual std::string getInventoryString()
+	virtual std::string getInventoryString() const
 	{
 		return std::string("ItemObj ")+m_itemstring;
 	}
@@ -867,10 +871,10 @@ public:
 		Special methods
 	*/
 
-	InventoryItem * createInventoryItem();
+	InventoryItem * createInventoryItem() const;
 	
 #ifndef SERVER
-	video::ITexture * getItemImage();
+	video::ITexture * getItemImage() const;
 
 	void updateSceneNode()
 	{
@@ -888,7 +892,7 @@ public:
 		setBlockChanged();
 	}
 
-	std::string getItemString()
+	std::string getItemString() const
 	{
 		return m_itemstring;
 	}
@@ -905,7 +909,7 @@ protected:
 class PlayerObject : public MovingObject
 {
 public:
-	PlayerObject(MapBlock *block, s16 id, v3f pos):
+	PlayerObject(MapBlock *block, s16 id, const v3f &pos):
 		MovingObject(block, id, pos),
 		m_node(NULL),
 		m_yaw(0)
@@ -930,7 +934,7 @@ public:
 	{
 		return MAPBLOCKOBJECT_TYPE_PLAYER;
 	}
-	virtual void serialize(std::ostream &os, u8 version)
+	virtual void serialize(std::ostream &os, u8 version) const
 	{
 		// Object data is generated from actual player
 	}
@@ -1044,7 +1048,7 @@ public:
 	~MapBlockObjectList();
 
 	// Writes the count, id, the type id and the parameters of all objects
-	void serialize(std::ostream &os, u8 version);
+	void serialize(std::ostream &os, u8 version) const;
 
 	// Reads ids, type_ids and parameters.
 	// Creates, updates and deletes objects.
@@ -1076,10 +1080,11 @@ public:
 		it is removed.
 		Grabbing the lock is recommended while processing.
 	*/
+	const MapBlockObject * get(s16 id) const;
 	MapBlockObject * get(s16 id);
 
 	// You'll want to grab this in a SharedPtr
-	JMutexAutoLock * getLock()
+	const JMutexAutoLock * getLock() const
 	{
 		return new JMutexAutoLock(m_mutex);
 	}
@@ -1093,17 +1098,17 @@ public:
 	bool wrapObject(MapBlockObject *object);
 	
 	// origin is relative to block
-	void getObjects(v3f origin, f32 max_d,
-			core::array<DistanceSortedObject> &dest);
+	void getObjects(const v3f &origin, f32 max_d,
+			core::array<DistanceSortedObject> &dest) const;
 	
 	// Number of objects
-	s32 getCount()
+	s32 getCount() const
 	{
 		return m_objects.size();
 	}
 
 private:
-	JMutex m_mutex;
+	mutable JMutex m_mutex;
 	// Key is id
 	core::map<s16, MapBlockObject*> m_objects;
 	MapBlock *m_block;
