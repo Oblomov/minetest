@@ -55,7 +55,7 @@ u32 TimeTaker::stop(bool quiet)
 	return 0;
 }
 
-u32 TimeTaker::getTime()
+u32 TimeTaker::getTime() const
 {
 	u32 time2 = getTimeMs();
 	u32 dtime = time2 - m_time1;
