@@ -275,6 +275,155 @@ class map
 		Node* Cur;
 	}; // Iterator
 
+	//! Constant Iterator
+	class ConstIterator
+	{
+	public:
+
+		ConstIterator() : Root(0), Cur(0) {}
+
+		// Constructor(Node*)
+		ConstIterator(const Node* root) : Root(root)
+		{
+			reset();
+		}
+
+		// Copy constructor
+		ConstIterator(const ConstIterator& src) : Root(src.Root), Cur(src.Cur) {}
+		ConstIterator(const Iterator& src) : Root(src.Root), Cur(src.Cur) {}
+
+		void reset(bool atLowest=true)
+		{
+			if (atLowest)
+				Cur = getMin(Root);
+			else
+				Cur = getMax(Root);
+		}
+
+		bool atEnd() const
+		{
+			_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+			return Cur==0;
+		}
+
+		const Node* getNode() const
+		{
+			return Cur;
+		}
+
+		ConstIterator& operator=(const ConstIterator& src)
+		{
+			Root = src.Root;
+			Cur = src.Cur;
+			return (*this);
+		}
+
+		void operator++(int)
+		{
+			inc();
+		}
+
+		void operator--(int)
+		{
+			dec();
+		}
+
+
+		const Node* operator -> () const
+		{
+			return getNode();
+		}
+
+		const Node& operator* () const
+		{
+			_IRR_DEBUG_BREAK_IF(atEnd()) // access violation
+
+			return *Cur;
+		}
+
+	private:
+
+		const Node* getMin(const Node* n) const
+		{
+			while(n && n->getLeftChild())
+				n = n->getLeftChild();
+			return n;
+		}
+
+		const Node* getMax(const Node* n) const
+		{
+			while(n && n->getRightChild())
+				n = n->getRightChild();
+			return n;
+		}
+
+		void inc()
+		{
+			// Already at end?
+			if (Cur==0)
+				return;
+
+			if (Cur->getRightChild())
+			{
+				// If current node has a right child, the next higher node is the
+				// node with lowest key beneath the right child.
+				Cur = getMin(Cur->getRightChild());
+			}
+			else if (Cur->isLeftChild())
+			{
+				// No right child? Well if current node is a left child then
+				// the next higher node is the parent
+				Cur = Cur->getParent();
+			}
+			else
+			{
+				// Current node neither is left child nor has a right child.
+				// Ie it is either right child or root
+				// The next higher node is the parent of the first non-right
+				// child (ie either a left child or the root) up in the
+				// hierarchy. Root's parent is 0.
+				while(Cur->isRightChild())
+					Cur = Cur->getParent();
+				Cur = Cur->getParent();
+			}
+		}
+
+		void dec()
+		{
+			// Already at end?
+			if (Cur==0)
+				return;
+
+			if (Cur->getLeftChild())
+			{
+				// If current node has a left child, the next lower node is the
+				// node with highest key beneath the left child.
+				Cur = getMax(Cur->getLeftChild());
+			}
+			else if (Cur->isRightChild())
+			{
+				// No left child? Well if current node is a right child then
+				// the next lower node is the parent
+				Cur = Cur->getParent();
+			}
+			else
+			{
+				// Current node neither is right child nor has a left child.
+				// Ie it is either left child or root
+				// The next higher node is the parent of the first non-left
+				// child (ie either a right child or the root) up in the
+				// hierarchy. Root's parent is 0.
+
+				while(Cur->isLeftChild())
+					Cur = Cur->getParent();
+				Cur = Cur->getParent();
+			}
+		}
+
+		const Node* Root;
+		const Node* Cur;
+	}; // ConstIterator
+
 
 
 	//! Parent First Iterator.
@@ -798,6 +947,12 @@ class map
 	Iterator getIterator()
 	{
 		Iterator it(getRoot());
+		return it;
+	}
+	//! Returns a const iterator
+	ConstIterator getConstIterator() const
+	{
+		ConstIterator it(getRoot());
 		return it;
 	}
 	//! Returns a ParentFirstIterator.
