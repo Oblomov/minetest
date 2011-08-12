@@ -76,7 +76,7 @@ NodeMetadata* NodeMetadata::deSerialize(std::istream &is)
 	}
 }
 
-void NodeMetadata::serialize(std::ostream &os)
+void NodeMetadata::serialize(std::ostream &os) const
 {
 	u8 buf[2];
 	writeU16(buf, typeId());
@@ -100,7 +100,7 @@ void NodeMetadata::registerType(u16 id, Factory f)
 	NodeMetadataList
 */
 
-void NodeMetadataList::serialize(std::ostream &os)
+void NodeMetadataList::serialize(std::ostream &os) const
 {
 	u8 buf[6];
 	
@@ -112,8 +112,8 @@ void NodeMetadataList::serialize(std::ostream &os)
 	writeU16(buf, count);
 	os.write((char*)buf, 2);
 
-	for(core::map<v3s16, NodeMetadata*>::Iterator
-			i = m_data.getIterator();
+	for(core::map<v3s16, NodeMetadata*>::ConstIterator
+			i = m_data.getConstIterator();
 			i.atEnd()==false; i++)
 	{
 		v3s16 p = i.getNode()->getKey();
@@ -187,7 +187,7 @@ NodeMetadataList::~NodeMetadataList()
 	}
 }
 
-NodeMetadata* NodeMetadataList::get(v3s16 p)
+const NodeMetadata* NodeMetadataList::get(const v3s16 &p) const
 {
 	core::map<v3s16, NodeMetadata*>::Node *n;
 	n = m_data.find(p);
@@ -196,7 +196,16 @@ NodeMetadata* NodeMetadataList::get(v3s16 p)
 	return n->getValue();
 }
 
-void NodeMetadataList::remove(v3s16 p)
+NodeMetadata* NodeMetadataList::get(const v3s16 &p)
+{
+	core::map<v3s16, NodeMetadata*>::Node *n;
+	n = m_data.find(p);
+	if(n == NULL)
+		return NULL;
+	return n->getValue();
+}
+
+void NodeMetadataList::remove(const v3s16 &p)
 {
 	NodeMetadata *olddata = get(p);
 	if(olddata)
@@ -206,7 +215,7 @@ void NodeMetadataList::remove(v3s16 p)
 	}
 }
 
-void NodeMetadataList::set(v3s16 p, NodeMetadata *d)
+void NodeMetadataList::set(const v3s16 &p, NodeMetadata *d)
 {
 	remove(p);
 	m_data.insert(p, d);

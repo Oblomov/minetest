@@ -27,16 +27,16 @@ class Inventory;
 class SignNodeMetadata : public NodeMetadata
 {
 public:
-	SignNodeMetadata(std::string text);
+	SignNodeMetadata(const std::string &text);
 	//~SignNodeMetadata();
 	
 	virtual u16 typeId() const;
 	static NodeMetadata* create(std::istream &is);
-	virtual NodeMetadata* clone();
-	virtual void serializeBody(std::ostream &os);
-	virtual std::string infoText();
+	virtual NodeMetadata* clone() const;
+	virtual void serializeBody(std::ostream &os) const;
+	virtual std::string infoText() const;
 
-	std::string getText(){ return m_text; }
+	std::string getText() const { return m_text; }
 	void setText(std::string t){ m_text = t; }
 
 private:
@@ -51,12 +51,13 @@ public:
 	
 	virtual u16 typeId() const;
 	static NodeMetadata* create(std::istream &is);
-	virtual NodeMetadata* clone();
-	virtual void serializeBody(std::ostream &os);
-	virtual std::string infoText();
+	virtual NodeMetadata* clone() const;
+	virtual void serializeBody(std::ostream &os) const;
+	virtual std::string infoText() const;
+	virtual const Inventory* getInventory() const {return m_inventory;}
 	virtual Inventory* getInventory() {return m_inventory;}
-	virtual bool nodeRemovalDisabled();
-	virtual std::string getInventoryDrawSpecString();
+	virtual bool nodeRemovalDisabled() const;
+	virtual std::string getInventoryDrawSpecString() const;
 	
 private:
 	Inventory *m_inventory;
@@ -69,14 +70,15 @@ public:
 	~FurnaceNodeMetadata();
 	
 	virtual u16 typeId() const;
-	virtual NodeMetadata* clone();
+	virtual NodeMetadata* clone() const;
 	static NodeMetadata* create(std::istream &is);
-	virtual void serializeBody(std::ostream &os);
-	virtual std::string infoText();
+	virtual void serializeBody(std::ostream &os) const;
+	virtual std::string infoText() const;
+	virtual const Inventory* getInventory() const {return m_inventory;}
 	virtual Inventory* getInventory() {return m_inventory;}
-	virtual void inventoryModified();
+	virtual void inventoryModified() const;
 	virtual bool step(float dtime);
-	virtual std::string getInventoryDrawSpecString();
+	virtual std::string getInventoryDrawSpecString() const;
 
 private:
 	Inventory *m_inventory;

@@ -48,23 +48,24 @@ public:
 	virtual ~NodeMetadata();
 	
 	static NodeMetadata* deSerialize(std::istream &is);
-	void serialize(std::ostream &os);
+	void serialize(std::ostream &os) const;
 	
 	// This usually is the CONTENT_ value
 	virtual u16 typeId() const = 0;
-	virtual NodeMetadata* clone() = 0;
-	virtual void serializeBody(std::ostream &os) = 0;
-	virtual std::string infoText() {return "";}
+	virtual NodeMetadata* clone() const = 0;
+	virtual void serializeBody(std::ostream &os) const = 0;
+	virtual std::string infoText() const {return "";}
+	virtual const Inventory* getInventory() const {return NULL;}
 	virtual Inventory* getInventory() {return NULL;}
 	// This is called always after the inventory is modified, before
 	// the changes are copied elsewhere
-	virtual void inventoryModified(){}
+	virtual void inventoryModified() const {}
 	// A step in time. Returns true if metadata changed.
 	virtual bool step(float dtime) {return false;}
-	virtual bool nodeRemovalDisabled(){return false;}
+	virtual bool nodeRemovalDisabled() const {return false;}
 	// Used to make custom inventory menus.
 	// See format in guiInventoryMenu.cpp.
-	virtual std::string getInventoryDrawSpecString(){return "";}
+	virtual std::string getInventoryDrawSpecString() const {return "";}
 
 protected:
 	static void registerType(u16 id, Factory f);
@@ -81,15 +82,16 @@ class NodeMetadataList
 public:
 	~NodeMetadataList();
 
-	void serialize(std::ostream &os);
+	void serialize(std::ostream &os) const;
 	void deSerialize(std::istream &is);
 	
 	// Get pointer to data
-	NodeMetadata* get(v3s16 p);
+	const NodeMetadata* get(const v3s16 &p) const;
+	NodeMetadata* get(const v3s16 &p);
 	// Deletes data
-	void remove(v3s16 p);
+	void remove(const v3s16 &p);
 	// Deletes old data and sets a new one
-	void set(v3s16 p, NodeMetadata *d);
+	void set(const v3s16 &p, NodeMetadata *d);
 	
 	// A step in time. Returns true if something changed.
 	bool step(float dtime);

@@ -28,7 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Prototype
 SignNodeMetadata proto_SignNodeMetadata("");
 
-SignNodeMetadata::SignNodeMetadata(std::string text):
+SignNodeMetadata::SignNodeMetadata(const std::string &text):
 	m_text(text)
 {
 	NodeMetadata::registerType(typeId(), create);
@@ -42,15 +42,15 @@ NodeMetadata* SignNodeMetadata::create(std::istream &is)
 	std::string text = deSerializeString(is);
 	return new SignNodeMetadata(text);
 }
-NodeMetadata* SignNodeMetadata::clone()
+NodeMetadata* SignNodeMetadata::clone() const
 {
 	return new SignNodeMetadata(m_text);
 }
-void SignNodeMetadata::serializeBody(std::ostream &os)
+void SignNodeMetadata::serializeBody(std::ostream &os) const
 {
 	os<<serializeString(m_text);
 }
-std::string SignNodeMetadata::infoText()
+std::string SignNodeMetadata::infoText() const
 {
 	return std::string("\"")+m_text+"\"";
 }
@@ -83,33 +83,33 @@ NodeMetadata* ChestNodeMetadata::create(std::istream &is)
 	d->m_inventory->deSerialize(is);
 	return d;
 }
-NodeMetadata* ChestNodeMetadata::clone()
+NodeMetadata* ChestNodeMetadata::clone() const
 {
 	ChestNodeMetadata *d = new ChestNodeMetadata();
 	*d->m_inventory = *m_inventory;
 	return d;
 }
-void ChestNodeMetadata::serializeBody(std::ostream &os)
+void ChestNodeMetadata::serializeBody(std::ostream &os) const
 {
 	m_inventory->serialize(os);
 }
-std::string ChestNodeMetadata::infoText()
+std::string ChestNodeMetadata::infoText() const
 {
 	return "Chest";
 }
-bool ChestNodeMetadata::nodeRemovalDisabled()
+bool ChestNodeMetadata::nodeRemovalDisabled() const
 {
 	/*
 		Disable removal if chest contains something
 	*/
-	InventoryList *list = m_inventory->getList("0");
+	const InventoryList *list = m_inventory->getList("0");
 	if(list == NULL)
 		return false;
 	if(list->getUsedSlots() == 0)
 		return false;
 	return true;
 }
-std::string ChestNodeMetadata::getInventoryDrawSpecString()
+std::string ChestNodeMetadata::getInventoryDrawSpecString() const
 {
 	return
 		"invsize[8,9;]"
@@ -147,7 +147,7 @@ u16 FurnaceNodeMetadata::typeId() const
 {
 	return CONTENT_FURNACE;
 }
-NodeMetadata* FurnaceNodeMetadata::clone()
+NodeMetadata* FurnaceNodeMetadata::clone() const
 {
 	FurnaceNodeMetadata *d = new FurnaceNodeMetadata();
 	*d->m_inventory = *m_inventory;
@@ -167,13 +167,13 @@ NodeMetadata* FurnaceNodeMetadata::create(std::istream &is)
 
 	return d;
 }
-void FurnaceNodeMetadata::serializeBody(std::ostream &os)
+void FurnaceNodeMetadata::serializeBody(std::ostream &os) const
 {
 	m_inventory->serialize(os);
 	os<<itos(m_fuel_totaltime*10)<<" ";
 	os<<itos(m_fuel_time*10)<<" ";
 }
-std::string FurnaceNodeMetadata::infoText()
+std::string FurnaceNodeMetadata::infoText() const
 {
 	//return "Furnace";
 	if(m_fuel_time >= m_fuel_totaltime)
@@ -195,7 +195,7 @@ std::string FurnaceNodeMetadata::infoText()
 		return s;
 	}
 }
-void FurnaceNodeMetadata::inventoryModified()
+void FurnaceNodeMetadata::inventoryModified() const
 {
 	dstream<<"Furnace inventory modification callback"<<std::endl;
 }
@@ -357,7 +357,7 @@ bool FurnaceNodeMetadata::step(float dtime)
 	}
 	return changed;
 }
-std::string FurnaceNodeMetadata::getInventoryDrawSpecString()
+std::string FurnaceNodeMetadata::getInventoryDrawSpecString() const
 {
 	return
 		"invsize[8,9;]"
