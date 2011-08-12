@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "main.h" // For g_settings and g_texturesource
 #include "content_mapblock.h"
 
-void MeshMakeData::fill(u32 daynight_ratio, MapBlock *block)
+void MeshMakeData::fill(u32 daynight_ratio, const MapBlock *block)
 {
 	m_daynight_ratio = daynight_ratio;
 	m_blockpos = block->getPos();
@@ -64,13 +64,13 @@ void MeshMakeData::fill(u32 daynight_ratio, MapBlock *block)
 		*/
 		
 		// Get map
-		Map *map = block->getParent();
+		const Map *map = block->getParent();
 
 		for(u16 i=0; i<6; i++)
 		{
 			const v3s16 &dir = g_6dirs[i];
 			v3s16 bp = m_blockpos + dir;
-			MapBlock *b = map->getBlockNoCreateNoEx(bp);
+			const MapBlock *b = map->getBlockNoCreateNoEx(bp);
 			if(b)
 				b->copyTo(m_vmanip);
 		}

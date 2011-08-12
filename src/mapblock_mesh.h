@@ -137,7 +137,7 @@ struct MeshMakeData
 		Copy central data directly from block, and other data from
 		parent of block.
 	*/
-	void fill(u32 daynight_ratio, MapBlock *block);
+	void fill(u32 daynight_ratio, const MapBlock *block);
 };
 
 // This is the highest-level function in here
