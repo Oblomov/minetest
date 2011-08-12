@@ -46,14 +46,14 @@ struct SmoothTranslator
 		vect_aim(0,0,0)
 	{}
 
-	void init(v3f vect)
+	void init(const v3f &vect)
 	{
 		vect_old = vect;
 		vect_show = vect;
 		vect_aim = vect;
 	}
 
-	void update(v3f vect_new)
+	void update(const v3f &vect_new)
 	{
 		vect_old = vect_show;
 		vect_aim = vect_new;
@@ -102,7 +102,7 @@ public:
 	void addToScene(scene::ISceneManager *smgr);
 	void removeFromScene();
 	void updateLight(u8 light_at_pos);
-	v3s16 getLightPosition();
+	v3s16 getLightPosition() const;
 	void updateNodePos();
 
 	void step(float dtime, ClientEnvironment *env);
@@ -134,7 +134,7 @@ public:
 	void addToScene(scene::ISceneManager *smgr);
 	void removeFromScene();
 	void updateLight(u8 light_at_pos);
-	v3s16 getLightPosition();
+	v3s16 getLightPosition() const;
 	void updateNodePos();
 
 	void step(float dtime, ClientEnvironment *env);
@@ -143,9 +143,9 @@ public:
 
 	void initialize(const std::string &data);
 	
-	core::aabbox3d<f32>* getSelectionBox()
+	const core::aabbox3d<f32>* getSelectionBox() const
 		{return &m_selection_box;}
-	v3f getPosition()
+	v3f getPosition() const
 		{return m_position;}
 
 private:
@@ -175,7 +175,7 @@ public:
 	void addToScene(scene::ISceneManager *smgr);
 	void removeFromScene();
 	void updateLight(u8 light_at_pos);
-	v3s16 getLightPosition();
+	v3s16 getLightPosition() const;
 	void updateNodePos();
 
 	void step(float dtime, ClientEnvironment *env);
@@ -184,9 +184,9 @@ public:
 
 	void initialize(const std::string &data);
 	
-	core::aabbox3d<f32>* getSelectionBox()
+	const core::aabbox3d<f32>* getSelectionBox() const
 		{return &m_selection_box;}
-	v3f getPosition()
+	v3f getPosition() const
 		{return pos_translator.vect_show;}
 		//{return m_position;}
 
@@ -218,7 +218,7 @@ public:
 	void addToScene(scene::ISceneManager *smgr);
 	void removeFromScene();
 	void updateLight(u8 light_at_pos);
-	v3s16 getLightPosition();
+	v3s16 getLightPosition() const;
 	void updateNodePos();
 
 	void step(float dtime, ClientEnvironment *env);
@@ -227,9 +227,9 @@ public:
 
 	void initialize(const std::string &data);
 	
-	core::aabbox3d<f32>* getSelectionBox()
+	const core::aabbox3d<f32>* getSelectionBox() const
 		{return &m_selection_box;}
-	v3f getPosition()
+	v3f getPosition() const
 		{return pos_translator.vect_show;}
 		//{return m_position;}
 
@@ -264,7 +264,7 @@ public:
 	void addToScene(scene::ISceneManager *smgr);
 	void removeFromScene();
 	void updateLight(u8 light_at_pos);
-	v3s16 getLightPosition();
+	v3s16 getLightPosition() const;
 	void updateNodePos();
 
 	void step(float dtime, ClientEnvironment *env);
@@ -273,9 +273,9 @@ public:
 
 	void initialize(const std::string &data);
 	
-	core::aabbox3d<f32>* getSelectionBox()
+	const core::aabbox3d<f32>* getSelectionBox() const
 		{return &m_selection_box;}
-	v3f getPosition()
+	v3f getPosition() const
 		{return m_position;}
 
 private:

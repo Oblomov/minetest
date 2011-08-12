@@ -2169,7 +2169,7 @@ ClientActiveObject * Client::getSelectedActiveObject(
 	{
 		ClientActiveObject *obj = objects[i].obj;
 		
-		core::aabbox3d<f32> *selection_box = obj->getSelectionBox();
+		const core::aabbox3d<f32> *selection_box = obj->getSelectionBox();
 		if(selection_box == NULL)
 			continue;
 

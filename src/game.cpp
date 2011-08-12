@@ -1677,7 +1677,7 @@ void the_game(
 		{
 			//dstream<<"Client returned selected_active_object != NULL"<<std::endl;
 			
-			core::aabbox3d<f32> *selection_box
+			const core::aabbox3d<f32> *selection_box
 					= selected_active_object->getSelectionBox();
 			// Box should exist because object was returned in the
 			// first place

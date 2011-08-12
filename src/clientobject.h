@@ -47,10 +47,10 @@ public:
 	virtual void removeFromScene(){}
 	// 0 <= light_at_pos <= LIGHT_SUN
 	virtual void updateLight(u8 light_at_pos){}
-	virtual v3s16 getLightPosition(){return v3s16(0,0,0);}
-	virtual core::aabbox3d<f32>* getSelectionBox(){return NULL;}
-	virtual core::aabbox3d<f32>* getCollisionBox(){return NULL;}
-	virtual v3f getPosition(){return v3f(0,0,0);}
+	virtual v3s16 getLightPosition() const {return v3s16(0,0,0);}
+	const virtual core::aabbox3d<f32>* getSelectionBox() const {return NULL;}
+	const virtual core::aabbox3d<f32>* getCollisionBox() const {return NULL;}
+	virtual v3f getPosition() const {return v3f(0,0,0);}
 	
 	// Step object in time
 	virtual void step(float dtime, ClientEnvironment *env){}
@@ -58,7 +58,7 @@ public:
 	// Process a message sent by the server side object
 	virtual void processMessage(const std::string &data){}
 
-	virtual std::string infoText() {return "";}
+	virtual std::string infoText() const {return "";}
 
 	/*
 		This takes the return value of

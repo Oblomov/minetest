@@ -95,7 +95,7 @@ void TestCAO::updateLight(u8 light_at_pos)
 {
 }
 
-v3s16 TestCAO::getLightPosition()
+v3s16 TestCAO::getLightPosition() const
 {
 	return floatToInt(m_position, BS);
 }
@@ -242,7 +242,7 @@ void ItemCAO::updateLight(u8 light_at_pos)
 	}
 }
 
-v3s16 ItemCAO::getLightPosition()
+v3s16 ItemCAO::getLightPosition() const
 {
 	return floatToInt(m_position, BS);
 }
@@ -448,7 +448,7 @@ void RatCAO::updateLight(u8 light_at_pos)
 	}
 }
 
-v3s16 RatCAO::getLightPosition()
+v3s16 RatCAO::getLightPosition() const
 {
 	return floatToInt(m_position+v3f(0,BS*0.5,0), BS);
 }
@@ -619,7 +619,7 @@ void Oerkki1CAO::updateLight(u8 light_at_pos)
 	}
 }
 
-v3s16 Oerkki1CAO::getLightPosition()
+v3s16 Oerkki1CAO::getLightPosition() const
 {
 	return floatToInt(m_position+v3f(0,BS*1.5,0), BS);
 }
@@ -851,7 +851,7 @@ void FireflyCAO::updateLight(u8 light_at_pos)
 	}
 }
 
-v3s16 FireflyCAO::getLightPosition()
+v3s16 FireflyCAO::getLightPosition() const
 {
 	return floatToInt(m_position+v3f(0,BS*0.5,0), BS);
 }
