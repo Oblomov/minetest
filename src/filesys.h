@@ -33,22 +33,22 @@ struct DirListNode
 	bool dir;
 };
 
-std::vector<DirListNode> GetDirListing(std::string path);
+std::vector<DirListNode> GetDirListing(const std::string &path);
 
 // Returns true if already exists
-bool CreateDir(std::string path);
+bool CreateDir(const std::string &path);
 
 // Create all directories on the given path that don't already exist.
-bool CreateAllDirs(std::string path);
+bool CreateAllDirs(const std::string &path);
 
-bool PathExists(std::string path);
+bool PathExists(const std::string &path);
 
 // Only pass full paths to this one. True on success.
 // NOTE: The WIN32 version returns always true.
-bool RecursiveDelete(std::string path);
+bool RecursiveDelete(const std::string &path);
 
 // Only pass full paths to this one. True on success.
-bool RecursiveDeleteContent(std::string path);
+bool RecursiveDeleteContent(const std::string &path);
 
 }//fs
 

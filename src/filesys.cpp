@@ -37,7 +37,7 @@ namespace fs
 
 #define BUFSIZE MAX_PATH
 
-std::vector<DirListNode> GetDirListing(std::string pathstring)
+std::vector<DirListNode> GetDirListing(const std::string &pathstring)
 {
 	std::vector<DirListNode> listing;
 
@@ -123,7 +123,7 @@ Cleanup:
 	return listing;
 }
 
-bool CreateDir(std::string path)
+bool CreateDir(const std::string &path)
 {
 	bool r = CreateDirectory(path.c_str(), NULL);
 	if(r == true)
@@ -133,25 +133,23 @@ bool CreateDir(std::string path)
 	return false;
 }
 
-bool PathExists(std::string path)
+bool PathExists(const std::string &path)
 {
 	return (GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES);
 }
 
-bool RecursiveDelete(std::string path)
+bool RecursiveDelete(const std::string &path)
 {
 	std::cerr<<"Removing \""<<path<<"\""<<std::endl;
 
 	//return false;
 	
-	// This silly function needs a double-null terminated string...
-	// Well, we'll just make sure it has at least two, then.
-	path += "\0\0";
-
 	SHFILEOPSTRUCT sfo;
 	sfo.hwnd = NULL;
 	sfo.wFunc = FO_DELETE;
-	sfo.pFrom = path.c_str();
+	// This silly function needs a double-null terminated string...
+	// Well, we'll just make sure it has at least two, then.
+	sfo.pFrom = (path + "\0\0").c_str();
 	sfo.pTo = NULL;
 	sfo.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR;
 	
@@ -172,7 +170,7 @@ bool RecursiveDelete(std::string path)
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-std::vector<DirListNode> GetDirListing(std::string pathstring)
+std::vector<DirListNode> GetDirListing(const std::string &pathstring)
 {
 	std::vector<DirListNode> listing;
 
@@ -201,7 +199,7 @@ std::vector<DirListNode> GetDirListing(std::string pathstring)
 	return listing;
 }
 
-bool CreateDir(std::string path)
+bool CreateDir(const std::string &path)
 {
 	int r = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	if(r == 0)
@@ -217,13 +215,13 @@ bool CreateDir(std::string path)
 	}
 }
 
-bool PathExists(std::string path)
+bool PathExists(const std::string &path)
 {
 	struct stat st;
 	return (stat(path.c_str(),&st) == 0);
 }
 
-bool RecursiveDelete(std::string path)
+bool RecursiveDelete(const std::string &path)
 {
 	/*
 		Execute the 'rm' command directly, by fork() and execve()
@@ -271,7 +269,7 @@ bool RecursiveDelete(std::string path)
 
 #endif
 
-bool RecursiveDeleteContent(std::string path)
+bool RecursiveDeleteContent(const std::string &path)
 {
 	std::cerr<<"Removing content of \""<<path<<"\""<<std::endl;
 	std::vector<DirListNode> list = GetDirListing(path);
@@ -290,7 +288,7 @@ bool RecursiveDeleteContent(std::string path)
 	return true;
 }
 
-bool CreateAllDirs(std::string path)
+bool CreateAllDirs(const std::string &path)
 {
 
 	size_t pos;
