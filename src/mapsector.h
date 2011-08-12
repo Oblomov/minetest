@@ -43,30 +43,32 @@ class MapSector
 {
 public:
 	
-	MapSector(Map *parent, v2s16 pos);
+	MapSector(Map *parent, const v2s16 &pos);
 	virtual ~MapSector();
 
 	virtual u32 getId() const = 0;
 
 	void deleteBlocks();
 
-	v2s16 getPos()
+	const v2s16 &getPos() const
 	{
 		return m_pos;
 	}
 
+	const MapBlock * getBlockNoCreateNoEx(s16 y) const;
 	MapBlock * getBlockNoCreateNoEx(s16 y);
-	MapBlock * createBlankBlockNoInsert(s16 y);
+	MapBlock * createBlankBlockNoInsert(s16 y) const;
 	MapBlock * createBlankBlock(s16 y);
 
 	void insertBlock(MapBlock *block);
 	
 	void deleteBlock(MapBlock *block);
 	
+	void getBlocks(core::list<const MapBlock*> &dest) const;
 	void getBlocks(core::list<MapBlock*> &dest);
 	
 	// Always false at the moment, because sector contains no metadata.
-	bool differs_from_disk;
+	mutable bool differs_from_disk;
 
 protected:
 	
@@ -79,12 +81,13 @@ protected:
 	
 	// Last-used block is cached here for quicker access.
 	// Be sure to set this to NULL when the cached block is deleted 
-	MapBlock *m_block_cache;
-	s16 m_block_cache_y;
+	mutable MapBlock *m_block_cache;
+	mutable s16 m_block_cache_y;
 	
 	/*
 		Private methods
 	*/
+	const MapBlock *getBlockBuffered(s16 y) const;
 	MapBlock *getBlockBuffered(s16 y);
 
 };
@@ -92,7 +95,7 @@ protected:
 class ServerMapSector : public MapSector
 {
 public:
-	ServerMapSector(Map *parent, v2s16 pos);
+	ServerMapSector(Map *parent, const v2s16 &pos);
 	~ServerMapSector();
 	
 	u32 getId() const
@@ -105,12 +108,12 @@ public:
 		They do not handle blocks.
 	*/
 
-	void serialize(std::ostream &os, u8 version);
+	void serialize(std::ostream &os, u8 version) const;
 	
 	static ServerMapSector* deSerialize(
 			std::istream &is,
 			Map *parent,
-			v2s16 p2d,
+			const v2s16 &p2d,
 			core::map<v2s16, MapSector*> & sectors
 		);
 		
@@ -121,7 +124,7 @@ private:
 class ClientMapSector : public MapSector
 {
 public:
-	ClientMapSector(Map *parent, v2s16 pos);
+	ClientMapSector(Map *parent, const v2s16 &pos);
 	~ClientMapSector();
 	
 	u32 getId() const

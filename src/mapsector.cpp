@@ -23,7 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "exceptions.h"
 #include "mapblock.h"
 
-MapSector::MapSector(Map *parent, v2s16 pos):
+MapSector::MapSector(Map *parent, const v2s16 &pos):
 		differs_from_disk(false),
 		m_parent(parent),
 		m_pos(pos),
@@ -52,6 +52,32 @@ void MapSector::deleteBlocks()
 	m_blocks.clear();
 }
 
+const MapBlock * MapSector::getBlockBuffered(s16 y) const
+{
+	MapBlock *block;
+
+	if(m_block_cache != NULL && y == m_block_cache_y){
+		return m_block_cache;
+	}
+	
+	// If block doesn't exist, return NULL
+	core::map<s16, MapBlock*>::Node *n = m_blocks.find(y);
+	if(n == NULL)
+	{
+		block = NULL;
+	}
+	// If block exists, return it
+	else{
+		block = n->getValue();
+	}
+	
+	// Cache the last result
+	m_block_cache_y = y;
+	m_block_cache = block;
+	
+	return block;
+}
+
 MapBlock * MapSector::getBlockBuffered(s16 y)
 {
 	MapBlock *block;
@@ -78,19 +104,24 @@ MapBlock * MapSector::getBlockBuffered(s16 y)
 	return block;
 }
 
+const MapBlock * MapSector::getBlockNoCreateNoEx(s16 y) const
+{
+	return getBlockBuffered(y);
+}
+
 MapBlock * MapSector::getBlockNoCreateNoEx(s16 y)
 {
 	return getBlockBuffered(y);
 }
 
-MapBlock * MapSector::createBlankBlockNoInsert(s16 y)
+MapBlock * MapSector::createBlankBlockNoInsert(s16 y) const
 {
 	assert(getBlockBuffered(y) == NULL);
-
+	
 	v3s16 blockpos_map(m_pos.X, y, m_pos.Y);
 	
 	MapBlock *block = new MapBlock(m_parent, blockpos_map);
-	
+
 	return block;
 }
 
@@ -133,6 +164,20 @@ void MapSector::deleteBlock(MapBlock *block)
 	delete block;
 }
 
+void MapSector::getBlocks(core::list<const MapBlock*> &dest) const
+{
+	core::list<MapBlock*> ref_list;
+
+	core::map<s16, MapBlock*>::ConstIterator bi;
+
+	bi = m_blocks.getConstIterator();
+	for(; bi.atEnd() == false; bi++)
+	{
+		const MapBlock *b = bi.getNode()->getValue();
+		dest.push_back(b);
+	}
+}
+
 void MapSector::getBlocks(core::list<MapBlock*> &dest)
 {
 	core::list<MapBlock*> ref_list;
@@ -151,7 +196,7 @@ void MapSector::getBlocks(core::list<MapBlock*> &dest)
 	ServerMapSector
 */
 
-ServerMapSector::ServerMapSector(Map *parent, v2s16 pos):
+ServerMapSector::ServerMapSector(Map *parent, const v2s16 &pos):
 		MapSector(parent, pos)
 {
 }
@@ -160,7 +205,7 @@ ServerMapSector::~ServerMapSector()
 {
 }
 
-void ServerMapSector::serialize(std::ostream &os, u8 version)
+void ServerMapSector::serialize(std::ostream &os, u8 version) const
 {
 	if(!ser_ver_supported(version))
 		throw VersionMismatchException("ERROR: MapSector format not supported");
@@ -185,7 +230,7 @@ void ServerMapSector::serialize(std::ostream &os, u8 version)
 ServerMapSector* ServerMapSector::deSerialize(
 		std::istream &is,
 		Map *parent,
-		v2s16 p2d,
+		const v2s16 &p2d,
 		core::map<v2s16, MapSector*> & sectors
 	)
 {
@@ -247,7 +292,7 @@ ServerMapSector* ServerMapSector::deSerialize(
 	ClientMapSector
 */
 
-ClientMapSector::ClientMapSector(Map *parent, v2s16 pos):
+ClientMapSector::ClientMapSector(Map *parent, const v2s16 &pos):
 		MapSector(parent, pos)
 {
 }
