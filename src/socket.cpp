@@ -211,7 +211,7 @@ void UDPSocket::Bind(unsigned short port)
     }
 }
 
-void UDPSocket::Send(const Address & destination, const void * data, int size)
+void UDPSocket::Send(const Address & destination, const void * data, int size) const
 {
 	bool dumping_packet = false;
 	if(INTERNET_SIMULATOR)
@@ -299,7 +299,7 @@ int UDPSocket::Receive(Address & sender, void * data, int size)
 	return received;
 }
 
-int UDPSocket::GetHandle()
+int UDPSocket::GetHandle() const
 {
 	return m_handle;
 }

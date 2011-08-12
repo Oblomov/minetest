@@ -111,10 +111,10 @@ public:
 	void Bind(unsigned short port);
 	//void Close();
 	//bool IsOpen();
-	void Send(const Address & destination, const void * data, int size);
+	void Send(const Address & destination, const void * data, int size) const;
 	// Returns -1 if there is no data
 	int Receive(Address & sender, void * data, int size);
-	int GetHandle(); // For debugging purposes only
+	int GetHandle() const; // For debugging purposes only
 	void setTimeoutMs(int timeout_ms);
 	// Returns true if there is data, false if timeout occurred
 	bool WaitData(int timeout_ms);

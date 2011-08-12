@@ -99,11 +99,11 @@ public:
 	{}
 };
 
-inline u16 readPeerId(u8 *packetdata)
+inline u16 readPeerId(const u8 *packetdata)
 {
 	return readU16(&packetdata[4]);
 }
-inline u8 readChannel(u8 *packetdata)
+inline u8 readChannel(const u8 *packetdata)
 {
 	return readU8(&packetdata[6]);
 }
@@ -132,31 +132,31 @@ struct BufferedPacket
 };
 
 // This adds the base headers to the data and makes a packet out of it
-BufferedPacket makePacket(Address &address, u8 *data, u32 datasize,
+BufferedPacket makePacket(const Address &address, const u8 *data, u32 datasize,
 		u32 protocol_id, u16 sender_peer_id, u8 channel);
-BufferedPacket makePacket(Address &address, SharedBuffer<u8> &data,
+BufferedPacket makePacket(const Address &address, const SharedBuffer<u8> &data,
 		u32 protocol_id, u16 sender_peer_id, u8 channel);
 
 // Add the TYPE_ORIGINAL header to the data
 SharedBuffer<u8> makeOriginalPacket(
-		SharedBuffer<u8> data);
+		const SharedBuffer<u8> &data);
 
 // Split data in chunks and add TYPE_SPLIT headers to them
 core::list<SharedBuffer<u8> > makeSplitPacket(
-		SharedBuffer<u8> data,
+		const SharedBuffer<u8> &data,
 		u32 chunksize_max,
 		u16 seqnum);
 
 // Depending on size, make a TYPE_ORIGINAL or TYPE_SPLIT packet
 // Increments split_seqnum if a split packet is made
 core::list<SharedBuffer<u8> > makeAutoSplitPacket(
-		SharedBuffer<u8> data,
+		const SharedBuffer<u8> &data,
 		u32 chunksize_max,
 		u16 &split_seqnum);
 
 // Add the TYPE_RELIABLE header to the data
 SharedBuffer<u8> makeReliablePacket(
-		SharedBuffer<u8> data,
+		const SharedBuffer<u8> &data,
 		u16 seqnum);
 
 struct IncomingSplitPacket
@@ -172,7 +172,7 @@ struct IncomingSplitPacket
 	float time; // Seconds from adding
 	bool reliable; // If true, isn't deleted on timeout
 
-	bool allReceived()
+	bool allReceived() const
 	{
 		return (chunks.size() == chunk_count);
 	}
@@ -274,19 +274,19 @@ class ReliablePacketBuffer
 {
 public:
 	
-	void print();
-	bool empty();
-	u32 size();
+	void print() const;
+	bool empty() const;
+	u32 size() const;
 	RPBSearchResult findPacket(u16 seqnum);
 	RPBSearchResult notFound();
-	u16 getFirstSeqnum();
+	u16 getFirstSeqnum() const;
 	BufferedPacket popFirst();
 	BufferedPacket popSeqnum(u16 seqnum);
 	void insert(BufferedPacket &p);
 	void incrementTimeouts(float dtime);
 	void resetTimedOuts(float timeout);
-	bool anyTotaltimeReached(float timeout);
-	core::list<BufferedPacket> getTimedOuts(float timeout);
+	bool anyTotaltimeReached(float timeout) const;
+	core::list<BufferedPacket> getTimedOuts(float timeout) const;
 
 private:
 	core::list<BufferedPacket> m_list;
@@ -430,7 +430,7 @@ public:
 	void Serve(unsigned short port);
 	// Connect to a server
 	void Connect(Address address);
-	bool Connected();
+	bool Connected() const;
 
 	void Disconnect();
 
@@ -444,35 +444,37 @@ public:
 	u32 Receive(u16 &peer_id, u8 *data, u32 datasize);
 	
 	// These will automatically package the data as an original or split
-	void SendToAll(u8 channelnum, SharedBuffer<u8> data, bool reliable);
-	void Send(u16 peer_id, u8 channelnum, SharedBuffer<u8> data, bool reliable);
+	void SendToAll(u8 channelnum, const SharedBuffer<u8> &data,
+			bool reliable) const;
+	void Send(u16 peer_id, u8 channelnum, const SharedBuffer<u8> &data,
+			bool reliable) const;
 	// Send data as a packet; it will be wrapped in base header and
 	// optionally to a reliable packet.
 	void SendAsPacket(u16 peer_id, u8 channelnum,
-			SharedBuffer<u8> data, bool reliable);
+			const SharedBuffer<u8> &data, bool reliable) const;
 	// Sends a raw packet
-	void RawSend(const BufferedPacket &packet);
+	void RawSend(const BufferedPacket &packet) const;
 	
 	// May call PeerHandler methods
 	void RunTimeouts(float dtime);
 
 	// Can throw a PeerNotFoundException
-	Peer* GetPeer(u16 peer_id);
+	Peer* GetPeer(u16 peer_id) const;
 	// returns NULL if failed
-	Peer* GetPeerNoEx(u16 peer_id);
-	core::list<Peer*> GetPeers();
+	Peer* GetPeerNoEx(u16 peer_id) const;
+	core::list<Peer*> GetPeers() const;
 	
 	// Calls PeerHandler::deletingPeer
 	// Returns false if peer was not found
 	bool deletePeer(u16 peer_id, bool timeout);
 
 	void SetPeerID(u16 id){ m_peer_id = id; }
-	u16 GetPeerID(){ return m_peer_id; }
-	u32 GetProtocolID(){ return m_protocol_id; }
+	u16 GetPeerID() const { return m_peer_id; }
+	u32 GetProtocolID() const { return m_protocol_id; }
 
 	// For debug printing
-	void PrintInfo(std::ostream &out);
-	void PrintInfo();
+	void PrintInfo(std::ostream &out) const;
+	void PrintInfo() const;
 	u16 m_indentation;
 
 private:
