@@ -44,20 +44,20 @@ public:
 	//void move(f32 dtime, Map &map);
 	virtual void move(f32 dtime, Map &map, f32 pos_max_d) = 0;
 
-	v3f getSpeed()
+	const v3f &getSpeed() const
 	{
 		return m_speed;
 	}
 
-	void setSpeed(v3f speed)
+	void setSpeed(const v3f &speed)
 	{
 		m_speed = speed;
 	}
 	
 	// Y direction is ignored
-	void accelerate(v3f target_speed, f32 max_increase);
+	void accelerate(const v3f &target_speed, f32 max_increase);
 
-	v3f getPosition()
+	const v3f &getPosition() const
 	{
 		return m_position;
 	}
@@ -67,7 +67,7 @@ public:
 		return floatToInt(m_position + v3f(0,BS+BS/2,0), BS);
 	}
 
-	v3f getEyePosition()
+	v3f getEyePosition() const
 	{
 		// This is at the height of the eyes of the current figure
 		// return m_position + v3f(0, BS+BS/2, 0);
@@ -90,12 +90,12 @@ public:
 		m_yaw = yaw;
 	}
 
-	f32 getPitch()
+	f32 getPitch() const
 	{
 		return m_pitch;
 	}
 
-	f32 getYaw()
+	f32 getYaw() const
 	{
 		return m_yaw;
 	}
@@ -114,7 +114,7 @@ public:
 		return NULL;
 	}
 
-	const char * getName()
+	const char * getName() const
 	{
 		return m_name;
 	}
@@ -132,7 +132,7 @@ public:
 		any characters except a '\0', and such an ending that
 		deSerialize stops reading exactly at the right point.
 	*/
-	void serialize(std::ostream &os);
+	void serialize(std::ostream &os) const;
 	void deSerialize(std::istream &is);
 
 	bool touching_ground;

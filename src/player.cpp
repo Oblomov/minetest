@@ -62,7 +62,7 @@ void Player::resetInventory()
 }
 
 // Y direction is ignored
-void Player::accelerate(v3f target_speed, f32 max_increase)
+void Player::accelerate(const v3f &target_speed, f32 max_increase)
 {
 	v3f d_wanted = target_speed - m_speed;
 	d_wanted.Y = 0;
@@ -98,7 +98,7 @@ void Player::accelerate(v3f target_speed, f32 max_increase)
 #endif
 }
 
-void Player::serialize(std::ostream &os)
+void Player::serialize(std::ostream &os) const
 {
 	// Utilize a Settings object for storing values
 	Settings args;
