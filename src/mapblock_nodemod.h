@@ -34,7 +34,7 @@ struct NodeMod
 		type = a_type;
 		param = a_param;
 	}
-	bool operator==(const NodeMod &other)
+	bool operator==(const NodeMod &other) const
 	{
 		return (type == other.type && param == other.param);
 	}
@@ -48,7 +48,7 @@ public:
 	/*
 		returns true if the mod was different last time
 	*/
-	bool set(v3s16 p, const NodeMod &mod)
+	bool set(const v3s16 &p, const NodeMod &mod)
 	{
 		// See if old is different, cancel if it is not different.
 		core::map<v3s16, NodeMod>::Node *n = m_mods.find(p);
@@ -68,7 +68,7 @@ public:
 		return true;
 	}
 	// Returns true if there was one
-	bool get(v3s16 p, NodeMod *mod)
+	bool get(const v3s16 &p, NodeMod *mod) const
 	{
 		core::map<v3s16, NodeMod>::Node *n;
 		n = m_mods.find(p);
@@ -78,7 +78,7 @@ public:
 			*mod = n->getValue();
 		return true;
 	}
-	bool clear(v3s16 p)
+	bool clear(const v3s16 &p)
 	{
 		if(m_mods.find(p))
 		{
@@ -94,12 +94,12 @@ public:
 		m_mods.clear();
 		return true;
 	}
-	void copy(NodeModMap &dest)
+	void copy(NodeModMap &dest) const
 	{
 		dest.m_mods.clear();
 
-		for(core::map<v3s16, NodeMod>::Iterator
-				i = m_mods.getIterator();
+		for(core::map<v3s16, NodeMod>::ConstIterator
+				i = m_mods.getConstIterator();
 				i.atEnd() == false; i++)
 		{
 			dest.m_mods.insert(i.getNode()->getKey(), i.getNode()->getValue());
