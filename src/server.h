@@ -34,7 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 /*
 	Some random functions
 */
-v3f findSpawnPos(ServerMap &map);
+v3f findSpawnPos(const ServerMap &map);
 
 /*
 	A structure containing the data needed for queueing the fetching
@@ -73,7 +73,7 @@ public:
 	/*
 		peer_id=0 adds with nobody to send to
 	*/
-	void addBlock(u16 peer_id, v3s16 pos, u8 flags)
+	void addBlock(u16 peer_id, const v3s16 &pos, u8 flags)
 	{
 		DSTACK(__FUNCTION_NAME);
 	
@@ -121,19 +121,19 @@ public:
 		return q;
 	}
 
-	u32 size()
+	u32 size() const
 	{
 		JMutexAutoLock lock(m_mutex);
 		return m_queue.size();
 	}
 	
-	u32 peerItemCount(u16 peer_id)
+	u32 peerItemCount(u16 peer_id) const
 	{
 		JMutexAutoLock lock(m_mutex);
 
 		u32 count = 0;
 
-		core::list<QueuedBlockEmerge*>::Iterator i;
+		core::list<QueuedBlockEmerge*>::ConstIterator i;
 		for(i=m_queue.begin(); i!=m_queue.end(); i++)
 		{
 			QueuedBlockEmerge *q = *i;
@@ -146,7 +146,7 @@ public:
 
 private:
 	core::list<QueuedBlockEmerge*> m_queue;
-	JMutex m_mutex;
+	mutable JMutex m_mutex;
 };
 
 class Server;
@@ -199,10 +199,10 @@ struct PlayerInfo
 	float avg_rtt;
 
 	PlayerInfo();
-	void PrintLine(std::ostream *s);
+	void PrintLine(std::ostream *s) const;
 };
 
-u32 PIChecksum(core::list<PlayerInfo> &l);
+u32 PIChecksum(const core::list<PlayerInfo> &l);
 
 /*
 	Used for queueing and sorting block transfers in containers
@@ -211,13 +211,14 @@ u32 PIChecksum(core::list<PlayerInfo> &l);
 */
 struct PrioritySortedBlockTransfer
 {
-	PrioritySortedBlockTransfer(float a_priority, v3s16 a_pos, u16 a_peer_id)
+	PrioritySortedBlockTransfer(float a_priority, const v3s16 &a_pos,
+			u16 a_peer_id)
 	{
 		priority = a_priority;
 		pos = a_pos;
 		peer_id = a_peer_id;
 	}
-	bool operator < (PrioritySortedBlockTransfer &other)
+	bool operator < (PrioritySortedBlockTransfer &other) const
 	{
 		return priority < other.priority;
 	}
@@ -263,7 +264,7 @@ public:
 		Environment should be locked when this is called.
 		dtime is used for resetting send radius at slow interval
 	*/
-	void GetNextBlocks(Server *server, float dtime,
+	void GetNextBlocks(const Server *server, float dtime,
 			core::array<PrioritySortedBlockTransfer> &dest);
 
 	/*
@@ -272,19 +273,19 @@ public:
 		adds those blocks to active_blocks
 	*/
 	void SendObjectData(
-			Server *server,
+			const Server *server,
 			float dtime,
 			core::map<v3s16, bool> &stepped_blocks
 		);
 
-	void GotBlock(v3s16 p);
+	void GotBlock(const v3s16 &p);
 
-	void SentBlock(v3s16 p);
+	void SentBlock(const v3s16 &p);
 
-	void SetBlockNotSent(v3s16 p);
+	void SetBlockNotSent(const v3s16 &p);
 	void SetBlocksNotSent(core::map<v3s16, MapBlock*> &blocks);
 
-	s32 SendingCount()
+	s32 SendingCount() const
 	{
 		return m_blocks_sending.size();
 	}
@@ -294,7 +295,7 @@ public:
 	//       because it is related to emerging, not sending.
 	//void RunSendingTimeouts(float dtime, float timeout);
 
-	void PrintInfo(std::ostream &o)
+	void PrintInfo(std::ostream &o) const
 	{
 		o<<"RemoteClient "<<peer_id<<": "
 				<<"m_blocks_sent.size()="<<m_blocks_sent.size()
@@ -352,7 +353,7 @@ private:
 		and the client then sends two GOTBLOCKs.
 		This is resetted by PrintInfo()
 	*/
-	u32 m_excess_gotblocks;
+	mutable u32 m_excess_gotblocks;
 	
 	// CPU usage optimization
 	u32 m_nothing_to_send_counter;
@@ -396,7 +397,7 @@ public:
 		m_time_of_day_send_timer = 0;
 	}
 
-	bool getShutdownRequested()
+	bool getShutdownRequested() const
 	{
 		return m_shutdown_requested;
 	}
@@ -418,7 +419,7 @@ public:
 	void inventoryModified(InventoryContext *c, const std::string &id);
 
 	// Connection must be locked when called
-	std::wstring getStatusString();
+	std::wstring getStatusString() const;
 
 	void requestShutdown(void)
 	{
@@ -427,9 +428,9 @@ public:
 
 
 	// Envlock and conlock should be locked when calling this
-	void SendMovePlayer(Player *player);
+	void SendMovePlayer(const Player *player) const;
 	
-	u64 getPlayerAuthPrivs(const std::string &name)
+	u64 getPlayerAuthPrivs(const std::string &name) const
 	{
 		try{
 			return m_authmanager.getPrivs(name);
@@ -453,7 +454,7 @@ public:
 	}
 	
 	// Saves g_settings to configpath given at initialization
-	void saveConfig()
+	void saveConfig() const
 	{
 		if(m_configpath != "")
 			g_settings.updateConfigFile(m_configpath.c_str());
@@ -493,8 +494,8 @@ private:
 		Static send methods
 	*/
 	
-	static void SendHP(con::Connection &con, u16 peer_id, u8 hp);
-	static void SendAccessDenied(con::Connection &con, u16 peer_id,
+	static void SendHP(const con::Connection &con, u16 peer_id, u8 hp);
+	static void SendAccessDenied(const con::Connection &con, u16 peer_id,
 			const std::wstring &reason);
 	
 	/*
@@ -502,30 +503,32 @@ private:
 	*/
 
 	// Envlock and conlock should be locked when calling these
-	void SendObjectData(float dtime);
-	void SendPlayerInfos();
-	void SendInventory(u16 peer_id);
+	void SendObjectData(float dtime) const;
+	void SendPlayerInfos() const;
+	void SendInventory(u16 peer_id) const;
 	// send wielded item info about player to all
-	void SendWieldedItem(const Player *player);
+	void SendWieldedItem(const Player *player) const;
 	// send wielded item info about all players to all players
-	void SendPlayerItems();
-	void SendChatMessage(u16 peer_id, const std::wstring &message);
-	void BroadcastChatMessage(const std::wstring &message);
-	void SendPlayerHP(Player *player);
+	void SendPlayerItems() const;
+	void SendChatMessage(u16 peer_id, const std::wstring &message) const;
+	void BroadcastChatMessage(const std::wstring &message) const;
+	void SendPlayerHP(const Player *player) const;
 	/*
 		Send a node removal/addition event to all clients except ignore_id.
 		Additionally, if far_players!=NULL, players further away than
 		far_d_nodes are ignored and their peer_ids are added to far_players
 	*/
 	// Envlock and conlock should be locked when calling these
-	void sendRemoveNode(v3s16 p, u16 ignore_id=0,
-			core::list<u16> *far_players=NULL, float far_d_nodes=100);
-	void sendAddNode(v3s16 p, MapNode n, u16 ignore_id=0,
-			core::list<u16> *far_players=NULL, float far_d_nodes=100);
-	void setBlockNotSent(v3s16 p);
+	void sendRemoveNode(const v3s16 &p, u16 ignore_id=0,
+			core::list<u16> *far_players=NULL,
+			float far_d_nodes=100) const;
+	void sendAddNode(const v3s16 &p, const MapNode &n, u16 ignore_id=0,
+			core::list<u16> *far_players=NULL,
+			float far_d_nodes=100) const;
+	void setBlockNotSent(const v3s16 &p);
 	
 	// Environment and Connection must be locked when called
-	void SendBlockNoLock(u16 peer_id, MapBlock *block, u8 ver);
+	void SendBlockNoLock(u16 peer_id, const MapBlock *block, u8 ver) const;
 	
 	// Sends blocks to clients (locks env and con on its own)
 	void SendBlocks(float dtime);
@@ -537,12 +540,13 @@ private:
 	void UpdateCrafting(u16 peer_id);
 	
 	// When called, connection mutex should be locked
+	const RemoteClient* getClient(u16 peer_id) const;
 	RemoteClient* getClient(u16 peer_id);
 	
 	// When called, environment mutex should be locked
-	std::string getPlayerName(u16 peer_id)
+	std::string getPlayerName(u16 peer_id) const
 	{
-		Player *player = m_env.getPlayer(peer_id);
+		const Player *player = m_env.getPlayer(peer_id);
 		if(player == NULL)
 			return "[id="+itos(peer_id);
 		return player->getName();
@@ -563,7 +567,7 @@ private:
 	void handlePeerChange(PeerChange &c);
 	void handlePeerChanges();
 
-	u64 getPlayerPrivs(Player *player);
+	u64 getPlayerPrivs(const Player *player) const;
 
 	/*
 		Variables
@@ -582,11 +586,11 @@ private:
 
 	// Environment
 	ServerEnvironment m_env;
-	JMutex m_env_mutex;
+	mutable JMutex m_env_mutex;
 	
 	// Connection
 	con::Connection m_con;
-	JMutex m_con_mutex;
+	mutable JMutex m_con_mutex;
 	// Connected clients (behind the con mutex)
 	core::map<u16, RemoteClient*> m_clients;
 
@@ -608,9 +612,9 @@ private:
 	// The server mainly operates in this thread
 	ServerThread m_thread;
 	// This thread fetches and generates map
-	EmergeThread m_emergethread;
+	mutable EmergeThread m_emergethread;
 	// Queue of block coordinates to be processed by the emerge thread
-	BlockEmergeQueue m_emerge_queue;
+	mutable BlockEmergeQueue m_emerge_queue;
 	
 	/*
 		Time related stuff
