@@ -213,9 +213,9 @@ struct ContentFeatures
 		Quickhands for simple materials
 	*/
 	
-	void setTexture(u16 i, std::string name, u8 alpha=255);
+	void setTexture(u16 i, const std::string &name, u8 alpha=255);
 
-	void setAllTextures(std::string name, u8 alpha=255)
+	void setAllTextures(const std::string &name, u8 alpha=255)
 	{
 		for(u16 i=0; i<6; i++)
 		{
@@ -237,17 +237,17 @@ struct ContentFeatures
 		}
 	}
 
-	void setInventoryTexture(std::string imgname);
+	void setInventoryTexture(const std::string &imgname);
 	
-	void setInventoryTextureCube(std::string top,
-			std::string left, std::string right);
+	void setInventoryTextureCube(const std::string &top,
+			const std::string &left, const std::string &right);
 };
 
 /*
 	Call this to access the ContentFeature list
 */
 ContentFeatures & content_features(content_t i);
-ContentFeatures & content_features(MapNode &n);
+ContentFeatures & content_features(const MapNode &n);
 
 /*
 	Here is a bunch of DEPRECATED functions.
@@ -364,7 +364,7 @@ inline u8 face_contents(content_t m1, content_t m2)
 /*
 	Packs directions like (1,0,0), (1,-1,0)
 */
-inline u8 packDir(v3s16 dir)
+inline u8 packDir(const v3s16 &dir)
 {
 	u8 b = 0;
 
@@ -415,7 +415,7 @@ inline v3s16 unpackDir(u8 b)
 	NOTE: Currently this uses 2 bits for Z-,X-,Z+,X+, should there be Y+
 	      and Y- too?
 */
-v3s16 facedir_rotate(u8 facedir, v3s16 dir);
+v3s16 facedir_rotate(u8 facedir, const v3s16 &dir);
 
 enum LightBank
 {
@@ -491,7 +491,7 @@ struct MapNode
 		setContent(content);
 	}
 
-	bool operator==(const MapNode &other)
+	bool operator==(const MapNode &other) const
 	{
 		return (param0 == other.param0
 				&& param1 == other.param1
@@ -499,7 +499,7 @@ struct MapNode
 	}
 	
 	// To be used everywhere
-	content_t getContent()
+	content_t getContent() const
 	{
 		if(param0 < 0x80)
 			return param0;
@@ -525,24 +525,24 @@ struct MapNode
 	/*
 		These four are DEPRECATED I guess. -c55
 	*/
-	bool light_propagates()
+	bool light_propagates() const
 	{
 		return light_propagates_content(getContent());
 	}
-	bool sunlight_propagates()
+	bool sunlight_propagates() const
 	{
 		return sunlight_propagates_content(getContent());
 	}
-	u8 solidness()
+	u8 solidness() const
 	{
 		return content_solidness(getContent());
 	}
-	u8 light_source()
+	u8 light_source() const
 	{
 		return content_features(*this).light_source;
 	}
 
-	u8 getLightBanksWithSource()
+	u8 getLightBanksWithSource() const
 	{
 		// Select the brightest of [light source, propagated light]
 		u8 lightday = 0;
@@ -559,7 +559,7 @@ struct MapNode
 		return (lightday&0x0f) | ((lightnight<<4)&0xf0);
 	}
 
-	u8 getLight(enum LightBank bank)
+	u8 getLight(enum LightBank bank) const
 	{
 		// Select the brightest of [light source, propagated light]
 		u8 light = 0;
@@ -579,7 +579,7 @@ struct MapNode
 	
 	// 0 <= daylight_factor <= 1000
 	// 0 <= return value <= LIGHT_SUN
-	u8 getLightBlend(u32 daylight_factor)
+	u8 getLightBlend(u32 daylight_factor) const
 	{
 		u8 l = ((daylight_factor * getLight(LIGHTBANK_DAY)
 			+ (1000-daylight_factor) * getLight(LIGHTBANK_NIGHT))
@@ -629,21 +629,21 @@ struct MapNode
 		Returns: TileSpec. Can contain miscellaneous texture coordinates,
 		         which must be obeyed so that the texture atlas can be used.
 	*/
-	TileSpec getTile(v3s16 dir);
+	TileSpec getTile(const v3s16 &dir_f) const;
 	
 	/*
 		Gets mineral content of node, if there is any.
 		MINERAL_NONE if doesn't contain or isn't able to contain mineral.
 	*/
-	u8 getMineral();
+	u8 getMineral() const;
 	
 	/*
 		Serialization functions
 	*/
 
 	static u32 serializedLength(u8 version);
-	void serialize(u8 *dest, u8 version);
-	void deSerialize(u8 *source, u8 version);
+	void serialize(u8 *dest, u8 version) const;
+	void deSerialize(const u8 *source, u8 version);
 	
 };
 
@@ -663,8 +663,8 @@ struct MapNode
 	
 	returns encoded light value.
 */
-u8 getFaceLight(u32 daynight_ratio, MapNode n, MapNode n2,
-		v3s16 face_dir);
+u8 getFaceLight(u32 daynight_ratio, const MapNode &n, const MapNode &n2,
+		const v3s16 &face_dir);
 
 #endif
 

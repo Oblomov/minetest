@@ -35,7 +35,7 @@ ContentFeatures::~ContentFeatures()
 	delete special_atlas;
 }
 
-void ContentFeatures::setTexture(u16 i, std::string name, u8 alpha)
+void ContentFeatures::setTexture(u16 i, const std::string &name, u8 alpha)
 {
 	if(g_texturesource)
 	{
@@ -52,26 +52,21 @@ void ContentFeatures::setTexture(u16 i, std::string name, u8 alpha)
 		setInventoryTexture(name);
 }
 
-void ContentFeatures::setInventoryTexture(std::string imgname)
+void ContentFeatures::setInventoryTexture(const std::string &imgname)
 {
 	if(g_texturesource == NULL)
 		return;
-	
-	imgname += "^[forcesingle";
-	
-	inventory_texture = g_texturesource->getTextureRaw(imgname);
+
+	inventory_texture = g_texturesource->getTextureRaw(
+		imgname + "^[forcesingle");
 }
 
-void ContentFeatures::setInventoryTextureCube(std::string top,
-		std::string left, std::string right)
+void ContentFeatures::setInventoryTextureCube(const std::string &top,
+		const std::string &left, const std::string &right)
 {
 	if(g_texturesource == NULL)
 		return;
 	
-	str_replace_char(top, '^', '&');
-	str_replace_char(left, '^', '&');
-	str_replace_char(right, '^', '&');
-
 	std::string imgname_full;
 	imgname_full += "[inventorycube{";
 	imgname_full += top;
@@ -79,6 +74,9 @@ void ContentFeatures::setInventoryTextureCube(std::string top,
 	imgname_full += left;
 	imgname_full += "{";
 	imgname_full += right;
+
+	str_replace_char(imgname_full, '^', '&');
+
 	inventory_texture = g_texturesource->getTextureRaw(imgname_full);
 }
 
@@ -88,7 +86,7 @@ ContentFeatures & content_features(content_t i)
 {
 	return g_content_features[i];
 }
-ContentFeatures & content_features(MapNode &n)
+ContentFeatures & content_features(const MapNode &n)
 {
 	return content_features(n.getContent());
 }
@@ -161,7 +159,7 @@ void init_mapnode()
 	
 }
 
-v3s16 facedir_rotate(u8 facedir, v3s16 dir)
+v3s16 facedir_rotate(u8 facedir, const v3s16 &dir)
 {
 	/*
 		Face 2 (normally Z-) direction:
@@ -184,10 +182,13 @@ v3s16 facedir_rotate(u8 facedir, v3s16 dir)
 	return newdir;
 }
 
-TileSpec MapNode::getTile(v3s16 dir)
+TileSpec MapNode::getTile(const v3s16 &dir_f) const
 {
+	v3s16 dir;
 	if(content_features(*this).param_type == CPT_FACEDIR_SIMPLE)
-		dir = facedir_rotate(param1, dir);
+		dir = facedir_rotate(param1, dir_f);
+	else
+		dir = dir_f;
 	
 	TileSpec spec;
 	
@@ -236,7 +237,7 @@ TileSpec MapNode::getTile(v3s16 dir)
 	return spec;
 }
 
-u8 MapNode::getMineral()
+u8 MapNode::getMineral() const
 {
 	if(content_features(*this).param_type == CPT_MINERAL)
 	{
@@ -258,7 +259,7 @@ u32 MapNode::serializedLength(u8 version)
 	else
 		return 3;
 }
-void MapNode::serialize(u8 *dest, u8 version)
+void MapNode::serialize(u8 *dest, u8 version) const
 {
 	if(!ser_ver_supported(version))
 		throw VersionMismatchException("ERROR: MapNode format not supported");
@@ -295,7 +296,7 @@ void MapNode::serialize(u8 *dest, u8 version)
 		dest[2] = n_foreign.param2;
 	}
 }
-void MapNode::deSerialize(u8 *source, u8 version)
+void MapNode::deSerialize(const u8 *source, u8 version)
 {
 	if(!ser_ver_supported(version))
 		throw VersionMismatchException("ERROR: MapNode format not supported");
@@ -364,8 +365,8 @@ void MapNode::deSerialize(u8 *source, u8 version)
 	
 	returns encoded light value.
 */
-u8 getFaceLight(u32 daynight_ratio, MapNode n, MapNode n2,
-		v3s16 face_dir)
+u8 getFaceLight(u32 daynight_ratio, const MapNode &n, const MapNode &n2,
+		const v3s16 &face_dir)
 {
 	try{
 		u8 light;
