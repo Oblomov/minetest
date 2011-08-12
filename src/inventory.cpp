@@ -122,7 +122,8 @@ InventoryItem* InventoryItem::deSerialize(std::istream &is)
 	}
 }
 
-ServerActiveObject* InventoryItem::createSAO(ServerEnvironment *env, u16 id, v3f pos)
+ServerActiveObject* InventoryItem::createSAO(ServerEnvironment *env, u16 id,
+		const v3f &pos) const
 {
 	/*
 		Create an ItemSAO
@@ -154,7 +155,7 @@ InventoryItem *MaterialItem::createCookResult() const
 */
 
 #ifndef SERVER
-video::ITexture * CraftItem::getImage()
+video::ITexture * CraftItem::getImage() const
 {
 	if(g_texturesource == NULL)
 		return NULL;
@@ -166,7 +167,8 @@ video::ITexture * CraftItem::getImage()
 }
 #endif
 
-ServerActiveObject* CraftItem::createSAO(ServerEnvironment *env, u16 id, v3f pos)
+ServerActiveObject* CraftItem::createSAO(ServerEnvironment *env, u16 id,
+		const v3f &pos) const
 {
 	// Special cases
 	ServerActiveObject *obj = item_craft_create_object(m_subname, env, id, pos);
@@ -215,7 +217,7 @@ bool CraftItem::use(ServerEnvironment *env, Player *player)
 	TODO: Remove
 */
 #ifndef SERVER
-video::ITexture * MapBlockObjectItem::getImage()
+video::ITexture * MapBlockObjectItem::getImage() const
 {
 	if(m_inventorystring.substr(0,3) == "Rat")
 		return g_texturesource->getTextureRaw("rat.png");
@@ -226,7 +228,7 @@ video::ITexture * MapBlockObjectItem::getImage()
 	return NULL;
 }
 #endif
-std::string MapBlockObjectItem::getText()
+std::string MapBlockObjectItem::getText() const
 {
 	if(m_inventorystring.substr(0,3) == "Rat")
 		return "";
@@ -238,7 +240,7 @@ std::string MapBlockObjectItem::getText()
 }
 
 MapBlockObject * MapBlockObjectItem::createObject
-		(v3f pos, f32 player_yaw, f32 player_pitch)
+		(const v3f &pos, f32 player_yaw, f32 player_pitch) const
 {
 	std::istringstream is(m_inventorystring);
 	std::string name;
@@ -285,7 +287,7 @@ MapBlockObject * MapBlockObjectItem::createObject
 	Inventory
 */
 
-InventoryList::InventoryList(std::string name, u32 size)
+InventoryList::InventoryList(const std::string &name, u32 size)
 {
 	m_name = name;
 	m_size = size;
@@ -421,12 +423,12 @@ const std::string &InventoryList::getName() const
 	return m_name;
 }
 
-u32 InventoryList::getSize()
+u32 InventoryList::getSize() const
 {
 	return m_items.size();
 }
 
-u32 InventoryList::getUsedSlots()
+u32 InventoryList::getUsedSlots() const
 {
 	u32 num = 0;
 	for(u32 i=0; i<m_items.size(); i++)
@@ -438,7 +440,7 @@ u32 InventoryList::getUsedSlots()
 	return num;
 }
 
-u32 InventoryList::getFreeSlots()
+u32 InventoryList::getFreeSlots() const
 {
 	return getSize() - getUsedSlots();
 }
@@ -549,7 +551,7 @@ InventoryItem * InventoryList::addItem(u32 i, InventoryItem *newitem)
 	}
 }
 
-bool InventoryList::itemFits(u32 i, InventoryItem *newitem)
+bool InventoryList::itemFits(u32 i, const InventoryItem *newitem) const
 {
 	// If it is an empty position, it's an easy job.
 	const InventoryItem *to_item = getItem(i);
@@ -609,7 +611,7 @@ void InventoryList::decrementMaterials(u16 count)
 	}
 }
 
-void InventoryList::print(std::ostream &o)
+void InventoryList::print(std::ostream &o) const
 {
 	o<<"InventoryList:"<<std::endl;
 	for(u32 i=0; i<m_items.size(); i++)
