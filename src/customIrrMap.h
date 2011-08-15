@@ -48,17 +48,20 @@ class map
 		void setRed()			{ IsRed = true; }
 		void setBlack()			{ IsRed = false; }
 
-		RBTree* getLeftChild() const	{ return LeftChild; }
-		RBTree* getRightChild() const	{ return RightChild; }
-		RBTree* getParent() const		{ return Parent; }
+		const RBTree* getLeftChild() const	{ return LeftChild; }
+		RBTree* getLeftChild()			{ return LeftChild; }
+		const RBTree* getRightChild() const	{ return RightChild; }
+		RBTree* getRightChild()			{ return RightChild; }
+		const RBTree* getParent() const		{ return Parent; }
+		RBTree* getParent()			{ return Parent; }
 
-		ValueTypeRB getValue() const
+		const ValueTypeRB &getValue() const
 		{
 			_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 			return Value;
 		}
 
-		KeyTypeRB getKey() const
+		const KeyTypeRB &getKey() const
 		{
 			_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 			return Key;
