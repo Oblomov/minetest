@@ -30,7 +30,7 @@
 
 #include <vorbis/vorbisfile.h>
 
-#include <debug.h>
+#include "debug.h"
 #include "utility.h"
 #include "common_irrlicht.h"
 #include <map>
