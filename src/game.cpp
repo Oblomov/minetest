@@ -51,6 +51,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "tile.h" // For TextureSource
 #include "logoutputbuffer.h"
 
+#if USE_AUDIO
+#include "audio.h"
+#endif
+
 /*
 	Setting this to 1 enables a special camera mode that forces
 	the renderers to think that the camera statically points from
@@ -679,6 +683,14 @@ void the_game(
     std::string configpath
 )
 {
+#if USE_AUDIO
+	// environmental noise
+	Audio::system()->setAmbient("envnoise", "ambient");
+	// background music
+	// TODO allow turning the music on/off
+	Audio::system()->setAmbient("bgmusic", "music");
+#endif
+
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 	

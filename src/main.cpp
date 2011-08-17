@@ -410,6 +410,10 @@ Doing currently:
 #include "log.h"
 #include "mods.h"
 
+#if USE_AUDIO
+#include "audio.h"
+#endif
+
 /*
 	Settings.
 	These are loaded from the config file.
@@ -1312,6 +1316,15 @@ int main(int argc, char *argv[])
 	}
 	
 	std::string playername = g_settings->get("name");
+
+	/*
+		Audio system initialization
+	*/
+
+#if USE_AUDIO
+	Audio::system()->init(porting::getDataPath("sounds/"));
+	Audio::system()->setAmbient("bgmusic", "titlemusic");
+#endif
 
 	/*
 		Device initialization
