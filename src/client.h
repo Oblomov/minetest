@@ -153,6 +153,18 @@ struct ClientEvent
 	};
 };
 
+/* status of the player wrt to the enviroment */
+struct PlayerEnvStatus
+{
+	bool touching_ground;
+	// This oscillates so that the player jumps a bit above the surface
+	bool in_water;
+	// This is more stable and defines the maximum speed of the player
+	bool in_water_stable;
+	bool is_climbing;
+	bool swimming_up;
+};
+
 class Client : public con::PeerHandler, public InventoryManager, public IGameDef
 {
 public:
@@ -230,6 +242,9 @@ public:
 	NodeMetadata* getNodeMetadata(v3s16 p);
 
 	LocalPlayer* getLocalPlayer();
+
+	// Get the status of the player wrt to its environment
+	PlayerEnvStatus getPlayerEnvStatus();
 
 	void setPlayerControl(PlayerControl &control);
 

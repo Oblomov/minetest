@@ -1901,6 +1901,21 @@ LocalPlayer* Client::getLocalPlayer()
 	return m_env.getLocalPlayer();
 }
 
+PlayerEnvStatus Client::getPlayerEnvStatus()
+{
+	PlayerEnvStatus status;
+	LocalPlayer *player = m_env.getLocalPlayer();
+	assert(player != NULL);
+
+	status.touching_ground = player->touching_ground;
+	status.in_water = player->in_water;
+	status.in_water_stable = player->in_water_stable;
+	status.is_climbing = player->is_climbing;
+	status.swimming_up = player->swimming_up;
+
+	return status;
+}
+
 void Client::setPlayerControl(PlayerControl &control)
 {
 	//JMutexAutoLock envlock(m_env_mutex); //bulk comment-out
