@@ -79,6 +79,45 @@ else()
 	# This way Xxf86vm is found on OpenBSD too
 	find_library(XXF86VM_LIBRARY Xxf86vm)
 	set(CLIENT_PLATFORM_LIBS ${CLIENT_PLATFORM_LIBS} ${XXF86VM_LIBRARY})
+
+	# user visible option to enable/disable audio
+	OPTION(ENABLE_SOUND "Enable sound" ON)
+
+	# this is only set to 1 if sound is enabled _and_ available
+	set(USE_AUDIO 0)
+
+	if(ENABLE_SOUND)
+		# Sound libraries
+		find_package(OpenAL)
+		if (OPENAL_FOUND)
+			find_package(ALUT)
+			if (ALUT_FOUND)
+				find_package(Vorbis)
+				if (VORBIS_FOUND)
+					set(USE_AUDIO 1)
+					set(audio_SRCS audio.cpp)
+					set(SOUND_INCLUDE_DIRS
+						${OPENAL_INCLUDE_DIR}
+						${ALUT_INCLUDE_DIR}
+						${VORBIS_INCLUDE_DIR}
+					)
+					set(SOUND_LIBRARIES
+						${OPENAL_LIBRARIES}
+						${ALUT_LIBRARY}
+						${VORBIS_LIBRARIES}
+					)
+					message(STATUS "Sound enabled")
+				else(VORBIS_FOUND)
+					message(FATAL_ERROR "Sound enabled, but Vorbis libraries not found!")
+				endif(VORBIS_FOUND)
+			else(ALUT_FOUND)
+				message(FATAL_ERROR "Sound enabled, but ALUT not found!")
+			endif(ALUT_FOUND)
+		else(OPENAL_FOUND)
+			message(FATAL_ERROR "Sound enabled, but OpenAL not found!")
+		endif(OPENAL_FOUND)
+	endif(ENABLE_SOUND)
+
 endif()
 
 find_package(Jthread REQUIRED)
@@ -138,7 +177,7 @@ endif()
 # Client sources
 set(minetest_SRCS
 	${common_SRCS}
-	audio.cpp
+	${audio_SRCS}
 	content_cao.cpp
 	mapblock_mesh.cpp
 	farmesh.cpp
@@ -167,13 +206,11 @@ set(minetestserver_SRCS
 include_directories(
 	${PROJECT_BINARY_DIR}
 	${IRRLICHT_INCLUDE_DIR}
-	${OPENAL_INCLUDE_DIR}
-	${ALUT_INCLUDE_DIR}
-	${VORBIS_INCLUDE_DIR}
 	${ZLIB_INCLUDE_DIR}
 	${CMAKE_BUILD_TYPE}
 	${PNG_INCLUDE_DIR}
 	${GETTEXT_INCLUDE_DIR}
+	${SOUND_INLCUDE_DIR}
 	${JTHREAD_INCLUDE_DIR}
 	${SQLITE3_INCLUDE_DIR}
 )
@@ -187,14 +224,12 @@ if(BUILD_CLIENT)
 		${ZLIB_LIBRARIES}
 		${IRRLICHT_LIBRARY}
 		${OPENGL_LIBRARIES}
-		${OPENAL_LIBRARIES}
-		${ALUT_LIBRARY}
-		${VORBIS_LIBRARIES}
 		${JPEG_LIBRARIES}
 		${BZIP2_LIBRARIES}
 		${PNG_LIBRARIES}
 		${X11_LIBRARIES}
 		${GETTEXT_LIBRARY}
+		${SOUND_LIBRARIES}
 		${PLATFORM_LIBS}
 		${CLIENT_PLATFORM_LIBS}
 		${JTHREAD_LIBRARY}

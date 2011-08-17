@@ -19,7 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "common_irrlicht.h"
 #include "game.h"
-#include "audio.h"
 #include "client.h"
 #include "server.h"
 #include "guiPauseMenu.h"
@@ -32,6 +31,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "keycode.h"
 #include "farmesh.h"
 #include "mapblock.h"
+
+#if USE_AUDIO
+#include "audio.h"
+#endif
+
 
 /*
 	TODO: Move content-aware stuff to separate file by adding properties
@@ -769,12 +773,13 @@ void the_game(
 	std::wstring &error_message,
     std::string configpath
 )
-{	
+{
+#if USE_AUDIO
 	// Initalize Audio
 	std::cout << "Audio not initalized so we do it now" << std::endl;
 	Audio * audio = new Audio();
 	audio->initalize();
-	
+
 	// <Test sounds>
 	/*audio->registerSoundSource(new HelloWorldAudioSource());
 	audio->registerSoundSource(new HelloWorldAudioSource2());*/
@@ -782,15 +787,14 @@ void the_game(
 	FootstepAudioSource * footstepAudio;
 	JumpAudioSource * jumpAudio;
 
-	
+
 	audio->registerSoundSource(footstepAudio = new FootstepAudioSource());
 	audio->registerSoundSource(jumpAudio = new JumpAudioSource());
-	
+
 	audio->setAmbientSound("data/sounds/ambient.ogg");
 	audio->setAmbientSound("data/sounds/music.ogg");
-	
-	
-	
+#endif
+
 	video::IVideoDriver* driver = device->getVideoDriver();
 	scene::ISceneManager* smgr = device->getSceneManager();
 	
@@ -955,8 +959,10 @@ void the_game(
 		return;
 	}
 
+#if USE_AUDIO
 	// Tell the audio subsystem the camera
 	audio->setPlayerCamera(camera);
+#endif
 
 	camera->setFOV(FOV_ANGLE);
 
@@ -1510,7 +1516,8 @@ void the_game(
 				camera_yaw
 			);
 			client.setPlayerControl(control);
-			
+
+#if USE_AUDIO
 			// Define a sound for each action
 			footstepAudio->active = input->isKeyDown(
                 getKeySetting("keymap_forward")) || input->isKeyDown(
@@ -1520,7 +1527,8 @@ void the_game(
 			jumpAudio->active = input->isKeyDown(
                 getKeySetting("keymap_jump"));
 		}
-		
+#endif
+
 		/*
 			Run server
 		*/
@@ -1566,12 +1574,14 @@ void the_game(
 		v3f camera_position;
 		v3f player_position = client.getPlayerPosition(&camera_position);
 
+#if USE_AUDIO
 		// We update the position
 		// TODO: we now just need to optain the velocity
 		audio->updatePlayerPostion(player_position);
 
 		// Now we need to update the orientation
 		audio->updateOrientation();
+#endif
 
 		//TimeTaker //timer2("//timer2");
 
@@ -2267,15 +2277,16 @@ void the_game(
 			delete a;
 		}
 
+#if USE_AUDIO
 		/*
 		 * Sound begins
 		 */
 		//TODO: we need to register Objects ad Audio
 		// Where do we get the active objects in our area?
 
-		audio->processSound();		
+		audio->processSound();
+#endif
 
-	
 		/*
 			Drawing begins
 		*/
