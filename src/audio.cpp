@@ -64,23 +64,12 @@ void Audio::loadOggFile(const char *fileName, std::vector<char> &buffer, ALenum 
     int bitStream;
     long bytes;
     char array[BUFFER_SIZE];                // Local fixed size array
-    FILE *f;
     vorbis_info *pInfo;
     OggVorbis_File oggFile;
     
 
-    // Open for binary reading
-    f = fopen(fileName, "rb");
-
-	// Not sure if necessary
-    /*if (f == NULL)
-    {
-        dstream << "Cannot open " << fileName << " for reading..." << endl;
-        return;
-    }*/
-
     // Try opening the given file
-    if (ov_open(f, &oggFile, NULL, 0) != 0)
+    if (ov_fopen(fileName, &oggFile) != 0)
     {
     	dstream << "Error opening " << fileName << " for decoding..." << std::endl;
     	return;
