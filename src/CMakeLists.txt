@@ -240,9 +240,9 @@ else()
 	# Probably GCC
 	
 	if(WARN_ALL)
-		set(RELEASE_WARNING_FLAGS "-Wall -lalut -lvorbisfile")
+		set(RELEASE_WARNING_FLAGS "-Wall")
 	else()
-		set(RELEASE_WARNING_FLAGS " -lalut -lvorbisfile")
+		set(RELEASE_WARNING_FLAGS "")
 	endif()
 	
 	if(NOT APPLE AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -257,8 +257,8 @@ else()
 		set(ARCH i386)
 	endif()
 
-	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${RELEASE_WARNING_FLAGS} ${WARNING_FLAGS} -O3 -ffast-math -Wall -fomit-frame-pointer -pipe -funroll-loops -lalut -lvorbisfile")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g -O1 -Wall ${WARNING_FLAGS} -lalut -lvorbisfile")
+	set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${RELEASE_WARNING_FLAGS} ${WARNING_FLAGS} -O3 -ffast-math -Wall -fomit-frame-pointer -pipe -funroll-loops")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -O1 -Wall ${WARNING_FLAGS}")
 
 	if(USE_GPROF)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg")

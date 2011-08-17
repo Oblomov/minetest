@@ -44,6 +44,7 @@ find_package(Irrlicht)
 # Sound library
 find_package(OpenAL)
 find_package(ALUT)
+find_package(Vorbis)
 
 #
 # Installation
