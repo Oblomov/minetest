@@ -170,6 +170,21 @@ SoundSource::SoundSource(const SoundBuffer *buf)
 
 	alSource3f(sourceID, AL_POSITION, 0, 0, 0);
 	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
+
+	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.7);
+}
+
+SoundSource::SoundSource(const SoundSource &org)
+{
+	m_buffer = org.m_buffer;
+	alGenSources(1, &sourceID);
+
+	alSourcei(sourceID, AL_BUFFER, m_buffer->getBufferID());
+	alSourcei(sourceID, AL_SOURCE_RELATIVE,
+			isRelative() ? AL_TRUE : AL_FALSE);
+
+	setPosition(org.getPosition());
+	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
 }
 
 /*
@@ -231,12 +246,14 @@ Audio::Audio() :
 		shutdown();
 	}
 
+	alDistanceModel(AL_EXPONENT_DISTANCE);
+
 	dstream << "Audio system initialized: OpenAL "
 		<< alGetString(AL_VERSION)
 		<< ", using " << alcGetString(m_device, ALC_DEVICE_SPECIFIER)
 		<< std::endl;
-
 }
+
 
 Audio::~Audio()
 {
@@ -354,6 +371,50 @@ void Audio::setAmbient(const std::string &slotname,
 			<< ", cleared"
 			<< std::endl;
 	}
+}
+
+SoundSource *Audio::createSource(const std::string &sourcename,
+		const std::string &basename)
+{
+	if (!isAvailable())
+		return NULL;
+
+	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
+
+	if (present) {
+		dstream << "WARNING: attempt to re-create sound source "
+			<< sourcename << std::endl;
+		return present->getValue();
+	}
+
+	SoundBuffer *data(loadSound(basename));
+	if (!data) {
+		dstream << "Sound source " << sourcename << " not available: "
+			<< basename << " could not be loaded"
+			<< std::endl;
+		return NULL;
+	}
+
+	SoundSource *snd = new SoundSource(data);
+	if (snd) {
+		m_sound_source[sourcename] = snd;
+	}
+
+	return snd;
+}
+
+SoundSource *Audio::getSource(const std::string &sourcename)
+{
+	if (!isAvailable())
+		return NULL;
+
+	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
+
+	if (present)
+		return present->getValue();
+
+	return NULL;
+
 }
 
 void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)

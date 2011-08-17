@@ -80,19 +80,49 @@ private:
 class SoundSource
 {
 public:
+	/* create soun source attached to sound buffer */
 	SoundSource(const SoundBuffer *buf);
+
+	/* copy sound source (use same buffer) */
+	SoundSource(const SoundSource &org);
 	virtual bool isRelative() const { return false; }
 	virtual void stop() const
 	{
 		alSourceStop(sourceID);
 	}
+
+	virtual bool isPlaying() const
+	{
+		ALint val;
+		alGetSourcei(sourceID, AL_SOURCE_STATE, &val);
+		return val == AL_PLAYING;
+	}
+
 	virtual void play() const
 	{
 		alSourcePlay(sourceID);
 	}
+
 	virtual void loop(bool setting=true)
 	{
 		alSourcei(sourceID, AL_LOOPING, setting ? AL_TRUE : AL_FALSE);
+	}
+
+	virtual v3f getPosition() const
+	{
+		v3f pos;
+		alGetSource3f(sourceID, AL_POSITION,
+				&pos.X, &pos.Y, &pos.Z);
+		return pos;
+	}
+
+	virtual void setPosition(const v3f& pos)
+	{
+		alSource3f(sourceID, AL_POSITION, pos.X, pos.Y, pos.Z);
+	}
+	virtual void setPosition(ALfloat x, ALfloat y, ALfloat z)
+	{
+		alSource3f(sourceID, AL_POSITION, x, y, z);
 	}
 protected:
 	ALuint	sourceID;
@@ -132,6 +162,10 @@ public:
 
 	void updateListener(const scene::ICameraSceneNode* cam, const v3f &vel);
 
+	SoundSource *createSource(const std::string &sourcename,
+			const std::string &basename);
+	SoundSource *getSource(const std::string &sourcename);
+
 private:
 	Audio();
 	~Audio();
@@ -148,11 +182,13 @@ private:
 	AmbientSound *getAmbientSound(const std::string &basename);
 
 	typedef core::map<std::string, AmbientSound *> AmbientSoundMap;
-	// map slot to currently assigned ambient sound to that
-	// slot
+	typedef core::map<std::string, SoundSource *> SoundSourceMap;
+	// map slot to currently assigned ambient sound to that slot
 	AmbientSoundMap m_ambient_slot;
 	// map ambient sound name to actual ambient sound
 	AmbientSoundMap m_ambient_sound;
+	// map sound source name to actual sound source
+	SoundSourceMap m_sound_source;
 
 	bool m_can_vorbis;
 

@@ -684,11 +684,21 @@ void the_game(
 )
 {
 #if USE_AUDIO
+#if 1
 	// environmental noise
 	Audio::system()->setAmbient("envnoise", "ambient");
 	// background music
 	// TODO allow turning the music on/off
 	Audio::system()->setAmbient("bgmusic", "music");
+#else // TEST directional source
+	Audio::system()->setAmbient("bgmusic", "");
+	SoundSource *snd(Audio::system()->createSource("jungle", "jungle"));
+	if (snd) {
+		snd->loop();
+		snd->play();
+	}
+#endif
+
 #endif
 
 	video::IVideoDriver* driver = device->getVideoDriver();
