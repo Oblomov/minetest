@@ -132,6 +132,18 @@ struct ClientEvent
 	};
 };
 
+/* status of the player wrt to the enviroment */
+struct PlayerEnvStatus
+{
+	bool touching_ground;
+	// This oscillates so that the player jumps a bit above the surface
+	bool in_water;
+	// This is more stable and defines the maximum speed of the player
+	bool in_water_stable;
+	bool is_climbing;
+	bool swimming_up;
+};
+
 class Client : public con::PeerHandler, public InventoryManager
 {
 public:
@@ -209,6 +221,9 @@ public:
 	// Get the player position, and optionally put the
 	// eye position in *eye_position
 	v3f getPlayerPosition(v3f *eye_position=NULL);
+
+	// Get the status of the player wrt to its environment
+	PlayerEnvStatus getPlayerEnvStatus();
 
 	void setPlayerControl(PlayerControl &control);
 
