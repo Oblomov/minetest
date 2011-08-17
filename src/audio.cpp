@@ -124,40 +124,27 @@ void Audio::removeSoundSource(AudioSource* source)
 
 void Audio::setAmbientSound(const char* ambientSoundFile)
 {
-	/*
-	 * TODO: Two instances overlap. Need to fix that.
-	 */
-	 
-	/*ALuint buffer = alutCreateBufferFromFile(ambientSoundFile);
-	if(handleAlutError("Error creating buffer for Ambient Sound"))
-		return;
-	ALuint source;
-	alGenSources(1, &source);
-	alSourcei (source, AL_BUFFER,   buffer   );
-	alSourcef (source, AL_PITCH,    1.0f     );
-	alSourcef(source, AL_GAIN,     1.0f     );
-	alSourcei(source, AL_LOOPING, true);
-	alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
-	alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
-	handleAlutError("Error while setting attributes for ambient Sound");
-	alSourcePlay(source);
-	handleAlutError("Error on Handling Ambient playback Sound");*/
-	
-	//AudioSource * data = new AudioSource();
 	AudioSourceData data;
+
+	loadOggFile(ambientSoundFile, data.BufferData, data.Format, data.Freq);
+
 	alGenBuffers(1, &data.Buffer);
 	alGenSources(1, &data.Source);
-	alListener3f(AL_POSITION, data.SourcesPos[0], data.SourcesPos[1], data.SourcesPos[2]);
-    alSource3f(data.Source, AL_POSITION, data.SourcesPos[0], data.SourcesPos[1], data.SourcesPos[2]);
-    
-    loadOggFile(ambientSoundFile, data.BufferData, data.Format, data.Freq);
-    
-    alBufferData(data.Buffer, data.Format, &data.BufferData[0], static_cast<ALsizei>(data.BufferData.size()), data.Freq);
+	data.SourcesPos[0] = data.SourcesPos[1] = data.SourcesPos[2] =
+	data.SourcesVel[0] = data.SourcesVel[1] = data.SourcesVel[2] = 0.0f;
+
+	alBufferData(data.Buffer, data.Format, &data.BufferData[0], static_cast<ALsizei>(data.BufferData.size()), data.Freq);
+
 	alSourcei(data.Source, AL_BUFFER, data.Buffer);
+	alSourcei(data.Source, AL_SOURCE_RELATIVE, AL_TRUE);
+	alSource3f(data.Source, AL_POSITION,
+		data.SourcesPos[0], data.SourcesPos[1], data.SourcesPos[2]);
+	alSource3f(data.Source, AL_VELOCITY,
+		data.SourcesVel[0], data.SourcesVel[1], data.SourcesVel[2]);
+
 	alSourcePlay(data.Source);
-	
-	//alDeleteBuffers(1, &data.Buffer);
-  	//alDeleteSources(1, &data.Source);
+
+	handleAlutError("Setting up ambient sound");
 }
 
 void Audio::processSound()
