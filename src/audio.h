@@ -130,6 +130,8 @@ public:
 	void setAmbient(const std::string &slotname,
 			const std::string &basename);
 
+	void updateListener(const scene::ICameraSceneNode* cam, const v3f &vel);
+
 private:
 	Audio();
 	~Audio();
@@ -153,6 +155,10 @@ private:
 	AmbientSoundMap m_ambient_sound;
 
 	bool m_can_vorbis;
+
+	// listener position/velocity/orientation
+	ALfloat m_listener[12];
+
 };
 
 #endif // SERVER

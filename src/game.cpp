@@ -1799,6 +1799,10 @@ void the_game(
 		if(!disable_camera_update){
 			client.updateCamera(camera_position,
 				camera_direction, camera_fov);
+#if USE_AUDIO
+			Audio::system()->updateListener(camera.getCameraNode(),
+					player->getSpeed());
+#endif
 		}
 
 		//timer2.stop();

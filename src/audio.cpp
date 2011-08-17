@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vorbis/vorbisfile.h>
 
 #include "audio.h"
+#include "camera.h"
 
 #include "filesys.h"
 
@@ -353,7 +354,31 @@ void Audio::setAmbient(const std::string &slotname,
 			<< ", cleared"
 			<< std::endl;
 	}
+}
 
+void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
+{
+	v3f pos = cam->getPosition();
+	m_listener[0] = pos.X;
+	m_listener[1] = pos.Y;
+	m_listener[2] = pos.Z;
+
+	m_listener[3] = vel.X;
+	m_listener[4] = vel.Y;
+	m_listener[5] = vel.Z;
+
+	v3f at = cam->getTarget();
+	m_listener[6] = (pos.X - at.X);
+	m_listener[7] = (pos.Y - at.Y);
+	m_listener[8] = (at.Z - pos.Z); // oh yeah
+	v3f up = cam->getUpVector();
+	m_listener[9] = up.X;
+	m_listener[10] = up.Y;
+	m_listener[11] = up.Z;
+
+	alListenerfv(AL_POSITION, m_listener);
+	alListenerfv(AL_VELOCITY, m_listener + 3);
+	alListenerfv(AL_ORIENTATION, m_listener + 6);
 }
 
 SoundBuffer* Audio::loadSound(const std::string &basename)
