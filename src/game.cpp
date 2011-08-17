@@ -1570,15 +1570,6 @@ void the_game(
 		v3f camera_position;
 		v3f player_position = client.getPlayerPosition(&camera_position);
 
-#if USE_AUDIO
-		// We update the position
-		// TODO: we now just need to optain the velocity
-		audio->updatePlayerPostion(player_position);
-
-		// Now we need to update the orientation
-		audio->updateOrientation();
-#endif
-
 		//TimeTaker //timer2("//timer2");
 
 		/*
@@ -1641,6 +1632,15 @@ void the_game(
 		camera->setPosition(camera_position);
 		// *100.0 helps in large map coordinates
 		camera->setTarget(camera_position + camera_direction * 100.0);
+
+#if USE_AUDIO
+		// We update the position
+		// TODO: we now just need to optain the velocity
+		audio->updatePlayerPostion(camera_position);
+
+		// Now we need to update the orientation
+		audio->updateOrientation();
+#endif
 
 		if(FIELD_OF_VIEW_TEST){
 			client.updateCamera(v3f(0,0,0), v3f(0,0,1));
