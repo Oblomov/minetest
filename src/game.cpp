@@ -1518,10 +1518,12 @@ void the_game(
 			client.setPlayerControl(control);
 
 #if USE_AUDIO
+			PlayerEnvStatus pes(client.getPlayerEnvStatus());
 			// Define a sound for each action
-			footstepAudio->active = control.up || control.down
-				|| control.left || control.right;
-			jumpAudio->active = control.jump;
+			footstepAudio->active = pes.touching_ground && (
+				control.up || control.down ||
+				control.left || control.right);
+			jumpAudio->active = control.jump && !pes.in_water;
 		}
 #endif
 
