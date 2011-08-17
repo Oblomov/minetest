@@ -1519,13 +1519,9 @@ void the_game(
 
 #if USE_AUDIO
 			// Define a sound for each action
-			footstepAudio->active = input->isKeyDown(
-                getKeySetting("keymap_forward")) || input->isKeyDown(
-                getKeySetting("keymap_backward")) || input->isKeyDown(
-                getKeySetting("keymap_left")) || input->isKeyDown(
-                getKeySetting("keymap_right"));
-			jumpAudio->active = input->isKeyDown(
-                getKeySetting("keymap_jump"));
+			footstepAudio->active = control.up || control.down
+				|| control.left || control.right;
+			jumpAudio->active = control.jump;
 		}
 #endif
 
