@@ -697,6 +697,17 @@ void the_game(
 	snd->play();
 #endif
 
+	// player sounds
+	// TODO customize depending on walked ground
+	// walk
+	Audio::system()->setPlayerSound("walk", "footstep");
+	// jump
+	Audio::system()->setPlayerSound("jump", "jump");
+	// swim
+	Audio::system()->setPlayerSound("swim", "swim");
+	// enter/exit water
+	Audio::system()->setPlayerSound("splash", "splash");
+
 #endif
 
 	video::IVideoDriver* driver = device->getVideoDriver();

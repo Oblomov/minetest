@@ -173,7 +173,16 @@ public:
 	bool isAvailable() const { return m_context != NULL; }
 
 	void setAmbient(const std::string &slotname,
-			const std::string &basename);
+			const std::string &basename,
+			bool autoplay=true);
+
+	// player sounds are just like ambient sounds,
+	// except they don't autoplay
+	void setPlayerSound(const std::string &slotname,
+			const std::string &basename)
+	{ setAmbient(slotname, basename, false); }
+	AmbientSound *playerSound(const std::string &slotname)
+	{ return m_ambient_slot[slotname];}
 
 	void updateListener(const scene::ICameraSceneNode* cam, const v3f &vel);
 

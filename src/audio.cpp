@@ -353,23 +353,31 @@ AmbientSound *Audio::getAmbientSound(const std::string &basename)
 }
 
 void Audio::setAmbient(const std::string &slotname,
-		const std::string &basename)
+		const std::string &basename, bool autoplay)
 {
 	_CHECK_AVAIL;
 
-	if (m_ambient_slot.find(slotname))
-		((AmbientSound*)(m_ambient_slot[slotname]))->stop();
+	bool was_playing = autoplay;
+
+	AmbientSound *snd = NULL;
+	if (m_ambient_slot.find(slotname)) {
+		snd = m_ambient_slot[slotname];
+		was_playing = snd->isPlaying();
+		if (was_playing)
+			snd->stop();
+	}
 
 	if (basename.empty()) {
 		m_ambient_slot.remove(slotname);
 		return;
 	}
 
-	AmbientSound *snd = getAmbientSound(basename);
+	snd = getAmbientSound(basename);
 
 	if (snd) {
+		if (was_playing || autoplay)
+			snd->play();
 		m_ambient_slot[slotname] = snd;
-		snd->play();
 		dstream << "Ambient " << slotname
 			<< " switched to " << basename
 			<< std::endl;
