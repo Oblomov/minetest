@@ -77,6 +77,12 @@ private:
 	std::vector<char> buffer;
 };
 
+// check if audio source is actually present
+// (presently, if its buffer is non-zero)
+// TODO some kind of debug message
+
+#define _SOURCE_CHECK if (m_buffer == NULL) return
+
 class SoundSource
 {
 public:
@@ -88,11 +94,13 @@ public:
 	virtual bool isRelative() const { return false; }
 	virtual void stop() const
 	{
+		_SOURCE_CHECK;
 		alSourceStop(sourceID);
 	}
 
 	virtual bool isPlaying() const
 	{
+		_SOURCE_CHECK false;
 		ALint val;
 		alGetSourcei(sourceID, AL_SOURCE_STATE, &val);
 		return val == AL_PLAYING;
@@ -100,16 +108,19 @@ public:
 
 	virtual void play() const
 	{
+		_SOURCE_CHECK;
 		alSourcePlay(sourceID);
 	}
 
 	virtual void loop(bool setting=true)
 	{
+		_SOURCE_CHECK;
 		alSourcei(sourceID, AL_LOOPING, setting ? AL_TRUE : AL_FALSE);
 	}
 
 	virtual v3f getPosition() const
 	{
+		_SOURCE_CHECK v3f(0,0,0);
 		v3f pos;
 		alGetSource3f(sourceID, AL_POSITION,
 				&pos.X, &pos.Y, &pos.Z);
@@ -118,10 +129,12 @@ public:
 
 	virtual void setPosition(const v3f& pos)
 	{
+		_SOURCE_CHECK;
 		alSource3f(sourceID, AL_POSITION, pos.X, pos.Y, pos.Z);
 	}
 	virtual void setPosition(ALfloat x, ALfloat y, ALfloat z)
 	{
+		_SOURCE_CHECK;
 		alSource3f(sourceID, AL_POSITION, x, y, z);
 	}
 protected:
@@ -135,6 +148,7 @@ class AmbientSound : public SoundSource
 public:
 	AmbientSound(SoundBuffer *buf=NULL) : SoundSource(buf)
 	{
+		_SOURCE_CHECK;
 		loop();
 		// no rolloff
 		alSourcei(sourceID, AL_ROLLOFF_FACTOR, 0);
@@ -142,6 +156,7 @@ public:
 
 	virtual bool isRelative() const { return true; }
 };
+#undef _SOURCE_CHECK
 
 class Audio
 {
