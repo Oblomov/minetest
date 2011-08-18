@@ -112,6 +112,21 @@ public:
 		alSourcePlay(sourceID);
 	}
 
+	// should a sound be playing or not?
+	// this is different than just calling play()/stop()
+	// because calling play() on a playing sound would cause
+	// it to restart from the beginning
+	virtual void shouldPlay(bool should=true)
+	{
+		_SOURCE_CHECK;
+		bool playing = isPlaying();
+		if (should && !playing)
+			play();
+		else if (!should && playing)
+			stop();
+		// otherwise do nothing
+	}
+
 	virtual void loop(bool setting=true)
 	{
 		_SOURCE_CHECK;
