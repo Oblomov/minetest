@@ -693,10 +693,8 @@ void the_game(
 #else // TEST directional source
 	Audio::system()->setAmbient("bgmusic", "");
 	SoundSource *snd(Audio::system()->createSource("jungle", "jungle"));
-	if (snd) {
-		snd->loop();
-		snd->play();
-	}
+	snd->loop();
+	snd->play();
 #endif
 
 #endif

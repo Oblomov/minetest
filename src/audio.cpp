@@ -29,6 +29,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "debug.h"
 
+using std::nothrow;
+
 #define BUFFER_SIZE 32768
 
 static const char *alcErrorString(ALCenum err)
@@ -207,11 +209,8 @@ SoundSource::SoundSource(const SoundSource &org)
 Audio *Audio::m_system = NULL;
 
 Audio *Audio::system() {
-	if (!m_system) {
+	if (!m_system)
 		m_system = new Audio();
-		if (!m_system)
-			throw AudioSystemException("Failed to initialize audio system");
-	}
 
 	return m_system;
 }
@@ -347,11 +346,9 @@ AmbientSound *Audio::getAmbientSound(const std::string &basename)
 		return NULL;
 	}
 
-	AmbientSound *snd = new AmbientSound(data);
-	if (snd) {
+	AmbientSound *snd(new (nothrow) AmbientSound(data));
+	if (snd)
 		m_ambient_sound[basename] = snd;
-	}
-
 	return snd;
 }
 
@@ -388,8 +385,6 @@ void Audio::setAmbient(const std::string &slotname,
 SoundSource *Audio::createSource(const std::string &sourcename,
 		const std::string &basename)
 {
-	_CHECK_AVAIL NULL;
-
 	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
 
 	if (present) {
@@ -403,28 +398,29 @@ SoundSource *Audio::createSource(const std::string &sourcename,
 		dstream << "Sound source " << sourcename << " not available: "
 			<< basename << " could not be loaded"
 			<< std::endl;
-		return NULL;
 	}
 
-	SoundSource *snd = new SoundSource(data);
-	if (snd) {
-		m_sound_source[sourcename] = snd;
-	}
+	SoundSource *snd = new (nothrow) SoundSource(data);
+	m_sound_source[sourcename] = snd;
 
 	return snd;
 }
 
 SoundSource *Audio::getSource(const std::string &sourcename)
 {
-	_CHECK_AVAIL NULL;
-
 	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
 
 	if (present)
 		return present->getValue();
 
-	return NULL;
+	dstream << "WARNING: attempt to get sound source " << sourcename
+		<< " before it was created! Creating an empty one"
+		<< std::endl;
 
+	SoundSource *snd = new (nothrow) SoundSource(NULL);
+	m_sound_source[sourcename] = snd;
+
+	return snd;
 }
 
 void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
