@@ -704,7 +704,9 @@ void the_game(
 	// walking sound is always at feet position, which
 	// relative to camera/eyes/ears can be found is defined
 	// by the feet_eye_vector
-	Audio::system()->playerSound("walk")->setPosition(-feet_eye_vector);
+	SoundSource *snd(Audio::system()->playerSound("walk"));
+	snd->setPosition(-feet_eye_vector);
+	snd->setReferenceDistance(feet_eye_vector.getLength());
 	// jump
 	Audio::system()->setPlayerSound("jump", "jump");
 	// swim

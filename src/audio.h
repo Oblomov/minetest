@@ -160,6 +160,12 @@ public:
 		_SOURCE_CHECK;
 		alSource3f(sourceID, AL_POSITION, x, y, z);
 	}
+
+	virtual void setReferenceDistance(float dist)
+	{
+		_SOURCE_CHECK;
+		alSourcef(sourceID, AL_REFERENCE_DISTANCE, dist);
+	}
 protected:
 	ALuint	sourceID;
 
