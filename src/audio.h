@@ -91,7 +91,15 @@ public:
 
 	/* copy sound source (use same buffer) */
 	SoundSource(const SoundSource &org);
-	virtual bool isRelative() const { return false; }
+
+	virtual void setRelative(bool rel=true)
+	{
+		m_relative = rel;
+		alSourcei(sourceID, AL_SOURCE_RELATIVE,
+				rel ? AL_TRUE : AL_FALSE);
+	}
+	virtual bool isRelative() const { return m_relative; }
+
 	virtual void stop() const
 	{
 		_SOURCE_CHECK;
@@ -156,6 +164,7 @@ protected:
 	ALuint	sourceID;
 
 	const SoundBuffer* m_buffer;
+	bool m_relative;
 };
 
 class AmbientSound : public SoundSource
@@ -165,11 +174,8 @@ public:
 	{
 		_SOURCE_CHECK;
 		loop();
-		// no rolloff
-		alSourcei(sourceID, AL_ROLLOFF_FACTOR, 0);
+		setRelative();
 	}
-
-	virtual bool isRelative() const { return true; }
 };
 #undef _SOURCE_CHECK
 

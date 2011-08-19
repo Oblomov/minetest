@@ -166,7 +166,8 @@ SoundBuffer* SoundBuffer::loadOggFile(const std::string &fname)
 // see also define in audio.h
 #define _SOURCE_CHECK if (m_buffer == NULL) return
 
-SoundSource::SoundSource(const SoundBuffer *buf)
+SoundSource::SoundSource(const SoundBuffer *buf) :
+	m_relative(false)
 {
 	m_buffer = buf;
 
@@ -175,8 +176,6 @@ SoundSource::SoundSource(const SoundBuffer *buf)
 	alGenSources(1, &sourceID);
 
 	alSourcei(sourceID, AL_BUFFER, buf->getBufferID());
-	alSourcei(sourceID, AL_SOURCE_RELATIVE,
-			isRelative() ? AL_TRUE : AL_FALSE);
 
 	alSource3f(sourceID, AL_POSITION, 0, 0, 0);
 	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
@@ -187,6 +186,7 @@ SoundSource::SoundSource(const SoundBuffer *buf)
 SoundSource::SoundSource(const SoundSource &org)
 {
 	m_buffer = org.m_buffer;
+	m_relative = org.m_relative;
 
 	_SOURCE_CHECK;
 
