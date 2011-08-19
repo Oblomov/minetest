@@ -701,6 +701,10 @@ void the_game(
 	// TODO customize depending on walked ground
 	// walk
 	Audio::system()->setPlayerSound("walk", "footstep");
+	// walking sound is always at feet position, which
+	// relative to camera/eyes/ears can be found is defined
+	// by the feet_eye_vector
+	Audio::system()->playerSound("walk")->setPosition(-feet_eye_vector);
 	// jump
 	Audio::system()->setPlayerSound("jump", "jump");
 	// swim

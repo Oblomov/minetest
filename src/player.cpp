@@ -32,6 +32,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "environment.h"
 #include "gamedef.h"
 
+const v3f feet_eye_vector(0,BS+(5*BS)/8,0);
+
 Player::Player(IGameDef *gamedef):
 	touching_ground(false),
 	in_water(false),

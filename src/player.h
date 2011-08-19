@@ -32,6 +32,8 @@ class Map;
 class IGameDef;
 struct CollisionInfo;
 
+extern const v3f feet_eye_vector;
+
 class Player
 {
 public:
@@ -69,7 +71,7 @@ public:
 		// This is at the height of the eyes of the current figure
 		// return v3f(0, BS+BS/2, 0);
 		// This is more like in minecraft
-		return v3f(0,BS+(5*BS)/8,0);
+		return feet_eye_vector;
 	}
 
 	v3f getEyePosition()
