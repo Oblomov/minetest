@@ -713,6 +713,10 @@ void the_game(
 	Audio::system()->setPlayerSound("swim", "swim");
 	// enter/exit water
 	Audio::system()->setPlayerSound("splash", "splash");
+	// splash sound doesn't loop, the control on its play status
+	// is done separately
+	Audio::system()->playerSound("splash")->loop(false);
+
 
 	// other sound sources
 
@@ -1714,6 +1718,10 @@ void the_game(
 		}
 		else
 		{
+#if USE_AUDIO
+			static bool was_in_water = false;
+#endif
+
 			/*bool a_up,
 			bool a_down,
 			bool a_left,
@@ -1746,9 +1754,21 @@ void the_game(
 				pes.touching_ground && (
 					control.up || control.down ||
 					control.left || control.right));
+			// swim sound if moving in water
+			Audio::system()->playerSound("swim")->shouldPlay(
+				pes.in_water && (
+					control.up || control.down ||
+					control.left || control.right));
 			// jumping sound only when jumping and not in water
 			Audio::system()->playerSound("jump")->shouldPlay(
 				control.jump && !pes.in_water);
+			// splashing sound when oscillating in and out of water
+			if (was_in_water != pes.in_water) {
+				snd = Audio::system()->playerSound("splash");
+				if (!snd->isPlaying())
+					snd->play();
+				was_in_water = pes.in_water;
+			}
 #endif
 		}
 
