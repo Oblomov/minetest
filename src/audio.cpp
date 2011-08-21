@@ -299,6 +299,9 @@ void Audio::init(const std::string &path)
 			<< " not found, sounds will not be available."
 			<< std::endl;
 	}
+	// prepare an empty ambient sound that is to be used when
+	// mapped sounds are not present
+	m_ambient_sound[""] = new AmbientSound(NULL);
 }
 
 enum LoaderFormat {
@@ -367,11 +370,6 @@ void Audio::setAmbient(const std::string &slotname,
 			snd->stop();
 	}
 
-	if (basename.empty()) {
-		m_ambient_slot.remove(slotname);
-		return;
-	}
-
 	snd = getAmbientSound(basename);
 
 	if (snd) {
@@ -382,7 +380,9 @@ void Audio::setAmbient(const std::string &slotname,
 			<< " switched to " << basename
 			<< std::endl;
 	} else {
-		m_ambient_slot.remove(slotname);
+		// FIXME two-step assignment to cope with irrMap limitations
+		snd = m_ambient_sound[""];
+		m_ambient_slot[slotname] = snd;
 		dstream << "Ambient " << slotname
 			<< " could not switch to " << basename
 			<< ", cleared"
