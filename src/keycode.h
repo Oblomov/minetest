@@ -58,7 +58,7 @@ extern const KeyPress EscapeKey;
 extern const KeyPress NumberKey[10];
 
 // Key configuration getter
-KeyPress getKeySetting(const char *settingname);
+const KeyPress &getKeySetting(const char *settingname);
 
 // Clear fast lookup cache
 void clearKeyCache();

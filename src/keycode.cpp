@@ -327,7 +327,7 @@ const KeyPress NumberKey[] = {
 // A simple cache for quicker lookup
 core::map<std::string, KeyPress> g_key_setting_cache;
 
-KeyPress getKeySetting(const char *settingname)
+const KeyPress &getKeySetting(const char *settingname)
 {
 	core::map<std::string, KeyPress>::Node *n;
 	n = g_key_setting_cache.find(settingname);
