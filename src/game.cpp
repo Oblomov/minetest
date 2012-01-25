@@ -1758,7 +1758,8 @@ void the_game(
 			Audio::system()->playerSound("swim")->shouldPlay(
 				pes.in_water && (
 					control.up || control.down ||
-					control.left || control.right));
+					control.left || control.right ||
+					control.jump));
 			// jumping sound only when jumping and not in water
 			Audio::system()->playerSound("jump")->shouldPlay(
 				control.jump && !pes.in_water);
