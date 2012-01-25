@@ -150,6 +150,7 @@ void ContentFeatures::reset()
 	material.constant_time = 0.5;
 	legacy_facedir_simple = false;
 	legacy_wallmounted = false;
+	sound_walk = "footstep";
 }
 
 void ContentFeatures::serialize(std::ostream &os)
@@ -191,6 +192,7 @@ void ContentFeatures::serialize(std::ostream &os)
 	material.serialize(os);
 	writeU8(os, legacy_facedir_simple);
 	writeU8(os, legacy_wallmounted);
+	os<<serializeString(sound_walk);
 }
 
 void ContentFeatures::deSerialize(std::istream &is)
@@ -236,6 +238,11 @@ void ContentFeatures::deSerialize(std::istream &is)
 	material.deSerialize(is);
 	legacy_facedir_simple = readU8(is);
 	legacy_wallmounted = readU8(is);
+	try
+	{
+	sound_walk = deSerializeString(is);
+	}
+	catch(SerializationError &e) {};
 }
 
 /*

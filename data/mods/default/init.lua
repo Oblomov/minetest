@@ -1118,6 +1118,9 @@ minetest.register_node("default:stone_with_coal", {
 	is_ground_content = true,
 	material = minetest.digprop_stonelike(1.0),
 	drop = 'default:coal_lump',
+	sound = {
+		walk = "default_stone_walk"
+	}
 })
 
 minetest.register_node("default:stone_with_iron", {
@@ -1126,6 +1129,7 @@ minetest.register_node("default:stone_with_iron", {
 	is_ground_content = true,
 	material = minetest.digprop_stonelike(1.0),
 	drop = 'default:iron_lump',
+	sound = { walk = "default_stone_walk" },
 })
 
 minetest.register_node("default:dirt_with_grass", {
@@ -1134,6 +1138,7 @@ minetest.register_node("default:dirt_with_grass", {
 	is_ground_content = true,
 	material = minetest.digprop_dirtlike(1.0),
 	drop = 'default:dirt',
+	sound = { walk = "default_grass_walk" },
 })
 
 minetest.register_node("default:dirt_with_grass_footsteps", {
@@ -1142,6 +1147,7 @@ minetest.register_node("default:dirt_with_grass_footsteps", {
 	is_ground_content = true,
 	material = minetest.digprop_dirtlike(1.0),
 	drop = 'default:dirt',
+	sound = { walk = "default_grass_walk" },
 })
 
 minetest.register_node("default:dirt", {
@@ -1171,6 +1177,7 @@ minetest.register_node("default:sandstone", {
 	is_ground_content = true,
 	material = minetest.digprop_dirtlike(1.0),  -- FIXME should this be stonelike?
 	drop = 'default:sand',
+	sound = { walk = "default_stone_walk" },
 })
 
 minetest.register_node("default:clay", {
@@ -1194,6 +1201,7 @@ minetest.register_node("default:tree", {
 	tile_images = {"default_tree_top.png", "default_tree_top.png", "default_tree.png"},
 	is_ground_content = true,
 	material = minetest.digprop_woodlike(1.0),
+	sound = { walk = "default_wood_walk" },
 })
 
 minetest.register_node("default:jungletree", {
@@ -1201,6 +1209,7 @@ minetest.register_node("default:jungletree", {
 	tile_images = {"default_jungletree_top.png", "default_jungletree_top.png", "default_jungletree.png"},
 	is_ground_content = true,
 	material = minetest.digprop_woodlike(1.0),
+	sound = { walk = "default_wood_walk" },
 })
 
 minetest.register_node("default:junglegrass", {
@@ -1213,6 +1222,7 @@ minetest.register_node("default:junglegrass", {
 	paramtype = "light",
 	walkable = false,
 	material = minetest.digprop_leaveslike(1.0),
+	sound = { walk = "default_grass_walk" },
 })
 
 minetest.register_node("default:leaves", {
@@ -1515,6 +1525,7 @@ minetest.register_node("default:cobble", {
 	tile_images = {"default_cobble.png"},
 	is_ground_content = true,
 	material = minetest.digprop_stonelike(0.9),
+	sound = { walk = "default_stone_walk" },
 })
 
 minetest.register_node("default:mossycobble", {
@@ -1522,6 +1533,7 @@ minetest.register_node("default:mossycobble", {
 	tile_images = {"default_mossycobble.png"},
 	is_ground_content = true,
 	material = minetest.digprop_stonelike(0.8),
+	sound = { walk = "default_stone_walk" },
 })
 
 minetest.register_node("default:steelblock", {
@@ -1529,6 +1541,7 @@ minetest.register_node("default:steelblock", {
 	tile_images = {"default_steel_block.png"},
 	is_ground_content = true,
 	material = minetest.digprop_stonelike(5.0),
+	sound = { walk = "default_metal_walk" },
 })
 
 minetest.register_node("default:nyancat", {

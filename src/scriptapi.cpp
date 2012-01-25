@@ -969,6 +969,21 @@ static ContentFeatures read_content_features(lua_State *L, int index)
 	// Set to true if wall_mounted used to be set to true
 	getboolfield(L, index, "legacy_wallmounted", f.legacy_wallmounted);
 
+	bool got_sound = false;
+	lua_getfield(L, index, "sound");
+	if (lua_istable(L, -1)) {
+		got_sound = getstringfield(L, -1, "walk", f.sound_walk);
+	}
+	lua_pop(L, 1);
+	/* if no walk sound is specified, build one from the name */
+	if (!got_sound) {
+		f.sound_walk = f.name;
+		str_replace(f.sound_walk, ":", "_");
+		f.sound_walk += "_walk";
+	}
+	dstream << "Walking sound for " << f.name
+		<< " is " << f.sound_walk << std::endl;
+
 	return f;
 }
 

@@ -362,15 +362,16 @@ void Audio::setAmbient(const std::string &slotname,
 
 	bool was_playing = autoplay;
 
-	AmbientSound *snd = NULL;
-	if (m_ambient_slot.find(slotname)) {
-		snd = m_ambient_slot[slotname];
-		was_playing = snd->isPlaying();
-		if (was_playing)
-			snd->stop();
-	}
+	AmbientSound *snd = getAmbientSound(basename);
 
-	snd = getAmbientSound(basename);
+	if (m_ambient_slot.find(slotname)) {
+		AmbientSound *oldsnd = m_ambient_slot[slotname];
+		if (oldsnd == snd)
+			return;
+		was_playing = oldsnd->isPlaying();
+		if (was_playing)
+			oldsnd->stop();
+	}
 
 	if (snd) {
 		if (was_playing || autoplay)

@@ -201,6 +201,9 @@ struct ContentFeatures
 	// Set to true if wall_mounted used to be set to true
 	bool legacy_wallmounted;
 
+	// Sound properties
+	std::string sound_walk;
+
 	/*
 		Methods
 	*/

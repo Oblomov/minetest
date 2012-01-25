@@ -698,7 +698,6 @@ void the_game(
 #endif
 
 	// player sounds
-	// TODO customize depending on walked ground
 	// walk
 	Audio::system()->setPlayerSound("walk", "footstep");
 	// walking sound is always at feet position, which
@@ -1867,6 +1866,16 @@ void the_game(
 			client.updateCamera(camera_position,
 				camera_direction, camera_fov);
 #if USE_AUDIO
+			// what are we standing on?
+			v3s16 pos_on = floatToInt(player_position-v3f(0,BS/2,0), BS);
+			try
+			{
+				MapNode n = client.getNode(pos_on);
+				Audio::system()->setPlayerSound("walk",
+						nodedef->get(n).sound_walk);
+			}
+			catch(InvalidPositionException &e) {};
+
 			Audio::system()->updateListener(camera.getCameraNode(),
 					player->getSpeed());
 #endif
