@@ -183,23 +183,6 @@ SoundSource::SoundSource(const SoundBuffer *buf) :
 	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.7);
 }
 
-SoundSource::SoundSource(const SoundSource &org)
-{
-	m_buffer = org.m_buffer;
-	m_relative = org.m_relative;
-
-	_SOURCE_CHECK;
-
-	alGenSources(1, &sourceID);
-
-	alSourcei(sourceID, AL_BUFFER, m_buffer->getBufferID());
-	alSourcei(sourceID, AL_SOURCE_RELATIVE,
-			isRelative() ? AL_TRUE : AL_FALSE);
-
-	setPosition(org.getPosition());
-	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
-}
-
 #undef _SOURCE_CHECK
 
 /*

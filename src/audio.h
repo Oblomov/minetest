@@ -86,11 +86,8 @@ private:
 class SoundSource
 {
 public:
-	/* create soun source attached to sound buffer */
+	/* create sound source attached to sound buffer */
 	SoundSource(const SoundBuffer *buf);
-
-	/* copy sound source (use same buffer) */
-	SoundSource(const SoundSource &org);
 
 	virtual void setRelative(bool rel=true)
 	{
@@ -171,6 +168,10 @@ protected:
 
 	const SoundBuffer* m_buffer;
 	bool m_relative;
+
+private: /* sound sources should not be copied around */
+	SoundSource(const SoundSource &org);
+	SoundSource& operator=(const SoundSource &org);
 };
 
 class AmbientSound : public SoundSource
