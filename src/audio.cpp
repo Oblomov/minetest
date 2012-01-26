@@ -22,6 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <vorbis/vorbisfile.h>
 
+#include <cstdlib> // rand
+
 #include "audio.h"
 #include "camera.h"
 
@@ -164,12 +166,13 @@ SoundBuffer* SoundBuffer::loadOggFile(const std::string &fname)
 // check if audio source is actually present
 // (presently, if its buf is non-zero)
 // see also define in audio.h
-#define _SOURCE_CHECK if (m_buffer == NULL) return
+#define _SOURCE_CHECK if (m_buffer.empty()) return
 
 SoundSource::SoundSource(const SoundBuffer *buf) :
 	m_relative(false)
 {
-	m_buffer = buf;
+	if (buf)
+		m_buffer.push_back(buf);
 
 	_SOURCE_CHECK;
 
@@ -181,6 +184,30 @@ SoundSource::SoundSource(const SoundBuffer *buf) :
 	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
 
 	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.7);
+}
+
+void
+SoundSource::addAlternative(const SoundBuffer *buf)
+{
+	if (buf)
+		m_buffer.push_back(buf);
+}
+
+void
+SoundSource::play() const
+{
+	_SOURCE_CHECK;
+	/* if we have multiple sound buffers, pick a random
+	   one to play. This must be done with the source
+	   in the stopped state. The behavior is not inconsistent
+	   with the single-source case because even in that case
+	   alSourcePlay() would stop and restart the execution. */
+	if (m_buffer.size() > 1) {
+		alSourceStop(sourceID);
+		size_t rnd = rand() % m_buffer.size();
+		alSourcei(sourceID, AL_BUFFER, m_buffer[rnd]->getBufferID());
+	}
+	alSourcePlay(sourceID);
 }
 
 #undef _SOURCE_CHECK

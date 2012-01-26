@@ -81,13 +81,15 @@ private:
 // (presently, if its buffer is non-zero)
 // TODO some kind of debug message
 
-#define _SOURCE_CHECK if (m_buffer == NULL) return
+#define _SOURCE_CHECK if (m_buffer.empty()) return
 
 class SoundSource
 {
 public:
 	/* create sound source attached to sound buffer */
 	SoundSource(const SoundBuffer *buf);
+
+	virtual void addAlternative(const SoundBuffer *buf);
 
 	virtual void setRelative(bool rel=true)
 	{
@@ -111,16 +113,15 @@ public:
 		return val == AL_PLAYING;
 	}
 
-	virtual void play() const
-	{
-		_SOURCE_CHECK;
-		alSourcePlay(sourceID);
-	}
+	// play sound, picking a random buffer if we have more than one
+	virtual void play() const;
 
-	// should a sound be playing or not?
-	// this is different than just calling play()/stop()
-	// because calling play() on a playing sound would cause
-	// it to restart from the beginning
+	/* should a sound be playing or not?
+	   while in the false case it's the same as calling stop(),
+	   for the true case its effect is different from calling
+	   play() directly because play() causes the sound to restart
+	   and it can possibly pick a different sample for multi-sample
+	   sound sources */
 	virtual void shouldPlay(bool should=true)
 	{
 		_SOURCE_CHECK;
@@ -166,7 +167,7 @@ public:
 protected:
 	ALuint	sourceID;
 
-	const SoundBuffer* m_buffer;
+	std::vector<const SoundBuffer*> m_buffer;
 	bool m_relative;
 
 private: /* sound sources should not be copied around */
