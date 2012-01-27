@@ -174,23 +174,26 @@ SoundSource::SoundSource(const SoundBuffer *buf) :
 	if (buf)
 		m_buffer.push_back(buf);
 
-	_SOURCE_CHECK;
-
 	alGenSources(1, &sourceID);
-
-	alSourcei(sourceID, AL_BUFFER, buf->getBufferID());
 
 	alSource3f(sourceID, AL_POSITION, 0, 0, 0);
 	alSource3f(sourceID, AL_VELOCITY, 0, 0, 0);
 
 	alSourcef(sourceID, AL_ROLLOFF_FACTOR, 0.7);
+
+	_SOURCE_CHECK;
+
+	alSourcei(sourceID, AL_BUFFER, buf->getBufferID());
 }
 
 void
 SoundSource::addAlternative(const SoundBuffer *buf)
 {
-	if (buf)
+	if (buf) {
 		m_buffer.push_back(buf);
+		if (m_buffer.size() == 1)
+			alSourcei(sourceID, AL_BUFFER, buf->getBufferID());
+	}
 }
 
 void
