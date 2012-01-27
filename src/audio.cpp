@@ -309,9 +309,10 @@ void Audio::init(const std::string &path)
 			<< " not found, sounds will not be available."
 			<< std::endl;
 	}
-	// prepare an empty ambient sound that is to be used when
-	// mapped sounds are not present
+	// prepare empty sound sources to be used when mapped sounds are not
+	// present
 	m_ambient_sound[""] = new AmbientSound(NULL);
+	m_player_sound[""] = new PlayerSound(NULL);
 }
 
 enum LoaderFormat {
@@ -342,7 +343,30 @@ std::string Audio::findSoundFile(const std::string &basename, u8 &fmt)
 	return "";
 }
 
-AmbientSound *Audio::getAmbientSound(const std::string &basename)
+PlayerSound *Audio::getPlayerSound(const std::string &basename)
+{
+	_CHECK_AVAIL NULL;
+
+	PlayerSoundMap::Node* cached = m_player_sound.find(basename);
+
+	if (cached)
+		return cached->getValue();
+
+	SoundBuffer *data(loadSound(basename));
+	if (!data) {
+		dstream << "Player sound "
+			<< " '" << basename << "' not available"
+			<< std::endl;
+		return NULL;
+	}
+
+	PlayerSound *snd(new (nothrow) PlayerSound(data));
+	if (snd)
+		m_player_sound[basename] = snd;
+	return snd;
+}
+
+AmbientSound *Audio::getAmbient(const std::string &basename)
 {
 	_CHECK_AVAIL NULL;
 
@@ -365,6 +389,35 @@ AmbientSound *Audio::getAmbientSound(const std::string &basename)
 	return snd;
 }
 
+void Audio::setPlayerSound(const std::string &slotname,
+		const std::string &basename)
+{
+	_CHECK_AVAIL;
+
+	PlayerSound *snd = getPlayerSound(basename);
+
+	if (m_player_slot.find(slotname)) {
+		PlayerSound *oldsnd = m_player_slot[slotname];
+		if (oldsnd == snd)
+			return;
+	}
+
+	if (snd) {
+		m_player_slot[slotname] = snd;
+		dstream << "Player sound " << slotname
+			<< " switched to " << basename
+			<< std::endl;
+	} else {
+		// FIXME two-step assignment to cope with irrMap limitations
+		snd = m_player_sound[""];
+		m_player_slot[slotname] = snd;
+		dstream << "Player sound " << slotname
+			<< " could not switch to " << basename
+			<< ", cleared"
+			<< std::endl;
+	}
+}
+
 void Audio::setAmbient(const std::string &slotname,
 		const std::string &basename, bool autoplay)
 {
@@ -372,7 +425,7 @@ void Audio::setAmbient(const std::string &slotname,
 
 	bool was_playing = autoplay;
 
-	AmbientSound *snd = getAmbientSound(basename);
+	AmbientSound *snd = getAmbient(basename);
 
 	if (m_ambient_slot.find(slotname)) {
 		AmbientSound *oldsnd = m_ambient_slot[slotname];

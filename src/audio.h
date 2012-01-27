@@ -175,6 +175,9 @@ private: /* sound sources should not be copied around */
 	SoundSource& operator=(const SoundSource &org);
 };
 
+/* ambient sounds are atmospheric sounds like background music
+   and unpositioned environmental noise (looping) */
+
 class AmbientSound : public SoundSource
 {
 public:
@@ -185,6 +188,20 @@ public:
 		setRelative();
 	}
 };
+
+/* player sounds are sounds emitted by the player or otherwise
+   relative to the player position (e.g. HUD) */
+
+class PlayerSound : public SoundSource
+{
+public:
+	PlayerSound(SoundBuffer *buf=NULL) : SoundSource(buf)
+	{
+		_SOURCE_CHECK;
+		setRelative();
+	}
+};
+
 #undef _SOURCE_CHECK
 
 class Audio
@@ -201,17 +218,20 @@ public:
 	void init(const std::string &path);
 	bool isAvailable() const { return m_context != NULL; }
 
+	/* assign a specific ambient sound to the given ambient slot */
 	void setAmbient(const std::string &slotname,
 			const std::string &basename,
 			bool autoplay=true);
 
-	// player sounds are just like ambient sounds,
-	// except they don't autoplay
+	/* assign a specific player sound to the given player slot */
 	void setPlayerSound(const std::string &slotname,
-			const std::string &basename)
-	{ setAmbient(slotname, basename, false); }
-	AmbientSound *playerSound(const std::string &slotname)
+			const std::string &basename);
+
+	/* get a specific ambient/player sound */
+	AmbientSound *ambientSound(const std::string &slotname)
 	{ return m_ambient_slot[slotname];}
+	PlayerSound *playerSound(const std::string &slotname)
+	{ return m_player_slot[slotname];}
 
 	void updateListener(const scene::ICameraSceneNode* cam, const v3f &vel);
 
@@ -232,15 +252,22 @@ private:
 	ALCdevice *m_device;
 	ALCcontext *m_context;
 
-	AmbientSound *getAmbientSound(const std::string &basename);
+	AmbientSound *getAmbient(const std::string &basename);
+	PlayerSound *getPlayerSound(const std::string &basename);
 
 	typedef core::map<std::string, AmbientSound *> AmbientSoundMap;
+	typedef core::map<std::string, PlayerSound *> PlayerSoundMap;
 	typedef core::map<std::string, SoundSource *> SoundSourceMap;
-	// map slot to currently assigned ambient sound to that slot
+
+	// map slot name to ambient sound source
 	AmbientSoundMap m_ambient_slot;
-	// map ambient sound name to actual ambient sound
+	// ambient sound source cache
 	AmbientSoundMap m_ambient_sound;
-	// map sound source name to actual sound source
+	// map slot name to player sound source
+	PlayerSoundMap m_player_slot;
+	// player sound source cache
+	PlayerSoundMap m_player_sound;
+	// generic sound source cache
 	SoundSourceMap m_sound_source;
 
 	bool m_can_vorbis;
