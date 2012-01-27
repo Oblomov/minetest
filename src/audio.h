@@ -90,6 +90,9 @@ public:
 	SoundSource(const SoundBuffer *buf);
 
 	virtual void addAlternative(const SoundBuffer *buf);
+	virtual size_t countAlternatives() {
+		return m_buffer.size();
+	}
 
 	virtual void setRelative(bool rel=true)
 	{
@@ -246,7 +249,7 @@ private:
 	void shutdown();
 
 	std::string findSoundFile(const std::string &basename, u8 &fmt);
-	SoundBuffer* loadSound(const std::string &basename);
+	template<typename T> T* loadSound(const std::string &basename);
 
 	std::string m_path;
 	ALCdevice *m_device;

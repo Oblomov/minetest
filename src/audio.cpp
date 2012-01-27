@@ -355,16 +355,13 @@ PlayerSound *Audio::getPlayerSound(const std::string &basename)
 	if (cached)
 		return cached->getValue();
 
-	SoundBuffer *data(loadSound(basename));
-	if (!data) {
+	PlayerSound *snd(loadSound<PlayerSound>(basename));
+
+	if (!snd) {
 		dstream << "Player sound "
 			<< " '" << basename << "' not available"
 			<< std::endl;
-		return NULL;
-	}
-
-	PlayerSound *snd(new (nothrow) PlayerSound(data));
-	if (snd)
+	} else
 		m_player_sound[basename] = snd;
 	return snd;
 }
@@ -378,16 +375,12 @@ AmbientSound *Audio::getAmbient(const std::string &basename)
 	if (cached)
 		return cached->getValue();
 
-	SoundBuffer *data(loadSound(basename));
-	if (!data) {
+	AmbientSound *snd(loadSound<AmbientSound>(basename));
+	if (!snd) {
 		dstream << "Ambient sound "
 			<< " '" << basename << "' not available"
 			<< std::endl;
-		return NULL;
-	}
-
-	AmbientSound *snd(new (nothrow) AmbientSound(data));
-	if (snd)
+	} else
 		m_ambient_sound[basename] = snd;
 	return snd;
 }
@@ -468,14 +461,13 @@ SoundSource *Audio::createSource(const std::string &sourcename,
 		return present->getValue();
 	}
 
-	SoundBuffer *data(loadSound(basename));
-	if (!data) {
+	SoundSource *snd(loadSound<SoundSource>(basename));
+	if (!snd) {
 		dstream << "Sound source " << sourcename << " not available: "
 			<< basename << " could not be loaded"
 			<< std::endl;
+		snd = new (nothrow) SoundSource(NULL);
 	}
-
-	SoundSource *snd = new (nothrow) SoundSource(data);
 	m_sound_source[sourcename] = snd;
 
 	return snd;
@@ -525,34 +517,85 @@ void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
 	alListenerfv(AL_ORIENTATION, m_listener + 6);
 }
 
-SoundBuffer* Audio::loadSound(const std::string &basename)
+/* list of suffixes to the base name to be used to look for alternatives to a
+ * sound buffer; for the moment, it's only the 1-9 numerics, so it could actually
+ * have been done smarter */
+static const char* altsfx[] = {
+	"1", "2", "3",
+	"4", "5", "6",
+	"7", "8", "9",
+	NULL
+};
+
+template<typename T> T*
+Audio::loadSound(const std::string &basename)
 {
 	_CHECK_AVAIL NULL;
 
+	SoundBuffer *buf = NULL;
+	T* source = NULL;
 	u8 fmt;
+	std::vector<std::string> alts;
+	std::vector<u8> fmts;
+
 	std::string fname(findSoundFile(basename, fmt));
 
 	if (fname.empty()) {
+		// look for alternatives <basename><sfx>
+		const char **sfx = altsfx;
+		while (*sfx) {
+			fname = findSoundFile(basename + *sfx, fmt);
+			if (!fname.empty()) {
+				alts.push_back(fname);
+				fmts.push_back(fmt);
+			}
+			++sfx;
+		}
+	} else {
+		// basename found, use it
+		alts.push_back(fname);
+		fmts.push_back(fmt);
+	}
+
+	if (alts.empty()) {
 		dstream << "WARNING: couldn't find audio file "
 			<< basename << " in " << m_path
 			<< std::endl;
-		return NULL;
+		return source;
 	}
 
 	dstream << "Audio file '" << basename
-		<< "' found as " << fname
-		<< std::endl;
+		<< "' found as ";
+	for (size_t i = 0; i < alts.size() - 1; ++i)
+		dstream << alts[i] << ", ";
+	dstream << alts[alts.size() - 1] << std::endl;
 
-	switch (fmt) {
-	case LOADER_VORBIS:
-		return SoundBuffer::loadOggFile(fname);
+	source = new (nothrow) T(NULL);
+	if (!source) {
+		dstream << "WARNING: failed to allocate memory for a new sound source!"
+			<< std::endl;
+		return source;
 	}
 
-	dstream << "WARNING: no appropriate loader found "
-		<< " for audio file " << fname
-		<< std::endl;
+	for (size_t i = 0; i < alts.size(); ++i) {
+		fname = alts[i];
+		fmt = fmts[i];
+		buf = NULL;
 
-	return NULL;
+		switch (fmt) {
+		case LOADER_VORBIS:
+			buf = SoundBuffer::loadOggFile(fname);
+		}
+
+		if (buf)
+			source->addAlternative(buf);
+		else
+			dstream << "WARNING: no appropriate loader found "
+				<< " for audio file " << fname
+				<< std::endl;
+	}
+
+	return source;
 }
 
 #undef _CHECK_AVAIL
