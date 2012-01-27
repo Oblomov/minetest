@@ -1719,6 +1719,7 @@ void the_game(
 		{
 #if USE_AUDIO
 			static bool was_in_water = false;
+			static bool was_touching_ground = false;
 #endif
 
 			/*bool a_up,
@@ -1761,6 +1762,12 @@ void the_game(
 				if (!snd->isPlaying())
 					snd->play();
 				was_in_water = pes.in_water;
+			}
+
+			if (was_touching_ground != pes.touching_ground) {
+				if (!was_touching_ground)
+					Audio::system()->playerSound("walk")->play();
+				was_touching_ground = pes.touching_ground;
 			}
 #endif
 		}
