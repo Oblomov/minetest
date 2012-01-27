@@ -29,6 +29,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "settings.h"
 #include "itemdef.h" // For wield visualization
 
+#include "config.h"
+#if USE_AUDIO
+#include "audio.h"
+#endif
+
 Camera::Camera(scene::ISceneManager* smgr, MapDrawControl& draw_control):
 	m_smgr(smgr),
 	m_playernode(NULL),
@@ -166,7 +171,16 @@ void Camera::step(f32 dtime)
 		}
 		else
 		{
+			float was = m_view_bobbing_anim;
 			m_view_bobbing_anim = my_modf(m_view_bobbing_anim + offset);
+			bool step = (was == 0 ||
+					(was < 0.5f && m_view_bobbing_anim >= 0.5f) ||
+					(was > 0.5f && m_view_bobbing_anim <= 0.5f));
+#if USE_AUDIO
+			if (step)
+				Audio::system()->playerSound("walk")->play();
+#endif
+
 		}
 	}
 

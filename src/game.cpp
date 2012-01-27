@@ -1746,13 +1746,6 @@ void the_game(
 #if USE_AUDIO
 			PlayerEnvStatus pes(client.getPlayerEnvStatus());
 
-			// only let the walk sound be heard if moving
-			// and touching ground
-			// TODO change walk sound depending on ground
-			Audio::system()->playerSound("walk")->shouldPlay(
-				pes.touching_ground && (
-					control.up || control.down ||
-					control.left || control.right));
 			// swim sound if moving in water
 			Audio::system()->playerSound("swim")->shouldPlay(
 				pes.in_water && (
