@@ -64,6 +64,7 @@ public:
 	static SoundBuffer* loadOggFile(const std::string &fname);
 private:
 	static core::map<std::string, SoundBuffer*> cache;
+	~SoundBuffer(); // prevent deletion
 
 public:
 	ALuint getBufferID() const
@@ -88,6 +89,7 @@ class SoundSource
 public:
 	/* create sound source attached to sound buffer */
 	SoundSource(const SoundBuffer *buf);
+	~SoundSource();
 
 	virtual void addAlternative(const SoundBuffer *buf);
 	virtual size_t countAlternatives() {

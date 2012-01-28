@@ -159,6 +159,12 @@ SoundBuffer* SoundBuffer::loadOggFile(const std::string &fname)
 	return cache[fname];
 }
 
+// TODO this should be done after checking that no sound source uses the buffer
+SoundBuffer::~SoundBuffer()
+{
+	alDeleteBuffers(1, &bufferID);
+}
+
 /*
 	Sound sources
 */
@@ -184,6 +190,11 @@ SoundSource::SoundSource(const SoundBuffer *buf) :
 	_SOURCE_CHECK;
 
 	alSourcei(sourceID, AL_BUFFER, buf->getBufferID());
+}
+
+SoundSource::~SoundSource()
+{
+	alDeleteSources(1, &sourceID);
 }
 
 void
