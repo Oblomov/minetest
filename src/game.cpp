@@ -721,8 +721,6 @@ void the_game(
 
 	// digging sound TODO customize depending on block type
 	SoundSource *digsnd(Audio::system()->createSource("dig", "dig"));
-	digsnd->loop();
-
 #endif
 
 	video::IVideoDriver* driver = device->getVideoDriver();
@@ -1972,9 +1970,6 @@ void the_game(
 				client.interact(1, pointed_old);
 				client.clearTempMod(pointed_old.node_undersurface);
 				dig_time = 0.0;
-#if USE_AUDIO
-				digsnd->shouldPlay(true);
-#endif
 			}
 		}
 		if(!digging && ldown_for_dig && !input->getLeftState())
@@ -1994,7 +1989,6 @@ void the_game(
 		{
 			v3s16 nodepos = pointed.node_undersurface;
 			v3s16 neighbourpos = pointed.node_abovesurface;
-
 #if USE_AUDIO
 			// TODO change the sound depending on node content
 			digsnd->setPosition(intToFloat(nodepos, BS));
@@ -2029,9 +2023,6 @@ void the_game(
 					client.interact(0, pointed);
 					digging = true;
 					ldown_for_dig = true;
-#if USE_AUDIO
-					digsnd->shouldPlay(true);
-#endif
 				}
 				MapNode n = client.getNode(nodepos);
 

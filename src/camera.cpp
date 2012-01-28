@@ -192,6 +192,9 @@ void Camera::step(f32 dtime)
 		{
 			m_digging_anim = 0;
 			m_digging_button = -1;
+#if USE_AUDIO
+			Audio::system()->getSource("dig")->play();
+#endif
 		}
 	}
 }
