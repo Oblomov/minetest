@@ -208,6 +208,21 @@ SoundSource::addAlternative(const SoundBuffer *buf)
 }
 
 void
+SoundSource::replace(const SoundSource *src)
+{
+	bool playing = isPlaying();
+	if (playing)
+		stop(); // TODO double buffer
+	m_buffer = src->m_buffer;
+	if (m_buffer.size() > 0)
+		alSourcei(sourceID, AL_BUFFER, m_buffer[0]->getBufferID());
+	else
+		alSourcei(sourceID, AL_BUFFER, 0);
+	if (playing)
+		play(); // TODO double buffer
+}
+
+void
 SoundSource::play() const
 {
 	_SOURCE_CHECK;
@@ -323,10 +338,8 @@ void Audio::init(const std::string &path)
 			<< " not found, sounds will not be available."
 			<< std::endl;
 	}
-	// prepare empty sound sources to be used when mapped sounds are not
-	// present
-	m_ambient_sound[""] = new AmbientSound(NULL);
-	m_player_sound[""] = new PlayerSound(NULL);
+	// empty sound sources to be used when mapped sounds are not present
+	m_sound_source[""] = new AmbientSound(NULL);
 }
 
 enum LoaderFormat {
@@ -357,42 +370,23 @@ std::string Audio::findSoundFile(const std::string &basename, u8 &fmt)
 	return "";
 }
 
-PlayerSound *Audio::getPlayerSound(const std::string &basename)
+const SoundSource *Audio::getSoundSource(const std::string &basename)
 {
 	_CHECK_AVAIL NULL;
 
-	PlayerSoundMap::Node* cached = m_player_sound.find(basename);
+	const SoundSourceCache::iterator cached = m_sound_source.find(basename);
 
-	if (cached)
-		return cached->getValue();
+	if (cached != m_sound_source.end())
+		return cached->second;
 
-	PlayerSound *snd(loadSound<PlayerSound>(basename));
+	const SoundSource *snd(loadSound(basename));
 
 	if (!snd) {
-		dstream << "Player sound "
-			<< " '" << basename << "' not available"
+		dstream << "Sound '" << basename << "' not available"
 			<< std::endl;
-	} else
-		m_player_sound[basename] = snd;
-	return snd;
-}
-
-AmbientSound *Audio::getAmbient(const std::string &basename)
-{
-	_CHECK_AVAIL NULL;
-
-	AmbientSoundMap::Node* cached = m_ambient_sound.find(basename);
-
-	if (cached)
-		return cached->getValue();
-
-	AmbientSound *snd(loadSound<AmbientSound>(basename));
-	if (!snd) {
-		dstream << "Ambient sound "
-			<< " '" << basename << "' not available"
-			<< std::endl;
-	} else
-		m_ambient_sound[basename] = snd;
+		snd = new SoundSource(NULL);
+	}
+	m_sound_source[basename] = snd;
 	return snd;
 }
 
@@ -401,28 +395,23 @@ void Audio::setPlayerSound(const std::string &slotname,
 {
 	_CHECK_AVAIL;
 
-	PlayerSound *snd = getPlayerSound(basename);
+	PlayerSound *slot;
 
-	if (m_player_slot.find(slotname)) {
-		PlayerSound *oldsnd = m_player_slot[slotname];
-		if (oldsnd == snd)
-			return;
-	}
+	if (m_player_slot.count(slotname) == 0)
+		m_player_slot[slotname] = new PlayerSound(NULL);
 
-	if (snd) {
-		m_player_slot[slotname] = snd;
-		dstream << "Player sound " << slotname
-			<< " switched to " << basename
-			<< std::endl;
-	} else {
-		// FIXME two-step assignment to cope with irrMap limitations
-		snd = m_player_sound[""];
-		m_player_slot[slotname] = snd;
-		dstream << "Player sound " << slotname
-			<< " could not switch to " << basename
-			<< ", cleared"
-			<< std::endl;
-	}
+	slot = m_player_slot[slotname];
+
+	if (slot->currentMap().compare(basename) == 0)
+		return;
+
+	const SoundSource *snd = getSoundSource(basename);
+
+	slot->replace(snd);
+	slot->mapTo(basename);
+	dstream << "Player sound " << slotname
+		<< " switched to " << basename
+		<< std::endl;
 }
 
 void Audio::setAmbient(const std::string &slotname,
@@ -430,75 +419,67 @@ void Audio::setAmbient(const std::string &slotname,
 {
 	_CHECK_AVAIL;
 
-	bool was_playing = autoplay;
+	AmbientSound *slot;
 
-	AmbientSound *snd = getAmbient(basename);
+	if (m_ambient_slot.count(slotname) == 0)
+		m_ambient_slot[slotname] = new AmbientSound(NULL);
 
-	if (m_ambient_slot.find(slotname)) {
-		AmbientSound *oldsnd = m_ambient_slot[slotname];
-		if (oldsnd == snd)
-			return;
-		was_playing = oldsnd->isPlaying();
-		if (was_playing)
-			oldsnd->stop();
-	}
+	slot = m_ambient_slot[slotname];
 
-	if (snd) {
-		if (was_playing || autoplay)
-			snd->play();
-		m_ambient_slot[slotname] = snd;
-		dstream << "Ambient " << slotname
-			<< " switched to " << basename
-			<< std::endl;
-	} else {
-		// FIXME two-step assignment to cope with irrMap limitations
-		snd = m_ambient_sound[""];
-		m_ambient_slot[slotname] = snd;
-		dstream << "Ambient " << slotname
-			<< " could not switch to " << basename
-			<< ", cleared"
-			<< std::endl;
-	}
+	if (slot->currentMap().compare(basename) == 0)
+		return;
+
+	const SoundSource *snd = getSoundSource(basename);
+
+	slot->replace(snd);
+	slot->mapTo(basename);
+	if (autoplay)
+		slot->play();
+
+	dstream << "Ambient " << slotname
+		<< " switched to " << basename
+		<< std::endl;
 }
 
 SoundSource *Audio::createSource(const std::string &sourcename,
 		const std::string &basename)
 {
-	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
+	SoundSource *slot;
 
-	if (present) {
+	SoundSourceMap::iterator present = m_sound_slot.find(sourcename);
+
+	if (present != m_sound_slot.end()) {
 		dstream << "WARNING: attempt to re-create sound source "
 			<< sourcename << std::endl;
-		return present->getValue();
+		slot = present->second;
+	} else {
+		m_sound_slot[sourcename] = slot = new SoundSource(NULL);
 	}
 
-	SoundSource *snd(loadSound<SoundSource>(basename));
-	if (!snd) {
-		dstream << "Sound source " << sourcename << " not available: "
-			<< basename << " could not be loaded"
-			<< std::endl;
-		snd = new (nothrow) SoundSource(NULL);
-	}
-	m_sound_source[sourcename] = snd;
+	const SoundSource *snd = getSoundSource(basename.empty() ?
+			sourcename : basename);
 
-	return snd;
+	slot->replace(snd);
+	slot->mapTo(basename);
+	dstream << "Created sound source " << sourcename
+		<< " with sound " << basename
+		<< std::endl;
+
+	return slot;
 }
 
 SoundSource *Audio::getSource(const std::string &sourcename)
 {
-	SoundSourceMap::Node* present = m_sound_source.find(sourcename);
+	SoundSourceMap::iterator present = m_sound_slot.find(sourcename);
 
-	if (present)
-		return present->getValue();
+	if (present != m_sound_slot.end())
+		return present->second;
 
 	dstream << "WARNING: attempt to get sound source " << sourcename
 		<< " before it was created! Creating an empty one"
 		<< std::endl;
 
-	SoundSource *snd = new (nothrow) SoundSource(NULL);
-	m_sound_source[sourcename] = snd;
-
-	return snd;
+	return createSource(sourcename);
 }
 
 void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
@@ -538,13 +519,13 @@ static const char* altsfx[] = {
 	NULL
 };
 
-template<typename T> T*
+SoundSource *
 Audio::loadSound(const std::string &basename)
 {
 	_CHECK_AVAIL NULL;
 
 	SoundBuffer *buf = NULL;
-	T* source = NULL;
+	SoundSource* source = NULL;
 	u8 fmt;
 	std::vector<std::string> alts;
 	std::vector<u8> fmts;
@@ -581,7 +562,7 @@ Audio::loadSound(const std::string &basename)
 		dstream << alts[i] << ", ";
 	dstream << alts[alts.size() - 1] << std::endl;
 
-	source = new (nothrow) T(NULL);
+	source = new (nothrow) SoundSource(NULL);
 	if (!source) {
 		dstream << "WARNING: failed to allocate memory for a new sound source!"
 			<< std::endl;

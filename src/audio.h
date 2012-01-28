@@ -45,6 +45,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "common_irrlicht.h"
 #include "exceptions.h"
@@ -92,9 +93,12 @@ public:
 	~SoundSource();
 
 	virtual void addAlternative(const SoundBuffer *buf);
-	virtual size_t countAlternatives() {
+	virtual size_t countAlternatives() const {
 		return m_buffer.size();
 	}
+
+	/* replace our sound buffers with the ones from src */
+	virtual void replace(const SoundSource *src);
 
 	virtual void setRelative(bool rel=true)
 	{
@@ -169,10 +173,17 @@ public:
 		_SOURCE_CHECK;
 		alSourcef(sourceID, AL_REFERENCE_DISTANCE, dist);
 	}
+
+	virtual void mapTo(const std::string &text)
+	{ m_map = text; }
+	virtual const std::string& currentMap() const
+	{ return m_map; }
+
 protected:
 	ALuint	sourceID;
 
 	std::vector<const SoundBuffer*> m_buffer;
+	std::string m_map;
 	bool m_relative;
 
 private: /* sound sources should not be copied around */
@@ -241,7 +252,7 @@ public:
 	void updateListener(const scene::ICameraSceneNode* cam, const v3f &vel);
 
 	SoundSource *createSource(const std::string &sourcename,
-			const std::string &basename);
+			const std::string &basename="");
 	SoundSource *getSource(const std::string &sourcename);
 
 private:
@@ -251,29 +262,27 @@ private:
 	void shutdown();
 
 	std::string findSoundFile(const std::string &basename, u8 &fmt);
-	template<typename T> T* loadSound(const std::string &basename);
+	SoundSource *loadSound(const std::string &basename);
 
 	std::string m_path;
 	ALCdevice *m_device;
 	ALCcontext *m_context;
 
-	AmbientSound *getAmbient(const std::string &basename);
-	PlayerSound *getPlayerSound(const std::string &basename);
+	const SoundSource *getSoundSource(const std::string &basename);
 
-	typedef core::map<std::string, AmbientSound *> AmbientSoundMap;
-	typedef core::map<std::string, PlayerSound *> PlayerSoundMap;
-	typedef core::map<std::string, SoundSource *> SoundSourceMap;
+	typedef std::map<std::string, const SoundSource *> SoundSourceCache;
+	typedef std::map<std::string, AmbientSound *> AmbientSoundMap;
+	typedef std::map<std::string, PlayerSound *> PlayerSoundMap;
+	typedef std::map<std::string, SoundSource *> SoundSourceMap;
 
+	// sound source cache
+	SoundSourceCache m_sound_source;
 	// map slot name to ambient sound source
 	AmbientSoundMap m_ambient_slot;
-	// ambient sound source cache
-	AmbientSoundMap m_ambient_sound;
 	// map slot name to player sound source
 	PlayerSoundMap m_player_slot;
-	// player sound source cache
-	PlayerSoundMap m_player_sound;
-	// generic sound source cache
-	SoundSourceMap m_sound_source;
+	// map generic sound name to sound source
+	SoundSourceMap m_sound_slot;
 
 	bool m_can_vorbis;
 
