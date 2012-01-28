@@ -514,7 +514,7 @@ void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
 	v3f at = cam->getTarget();
 	m_listener[6] = (pos.X - at.X);
 	m_listener[7] = (pos.Y - at.Y);
-	m_listener[8] = (at.Z - pos.Z); // oh yeah
+	m_listener[8] = (pos.Z - at.Z);
 	v3f up = cam->getUpVector();
 	m_listener[9] = up.X;
 	m_listener[10] = up.Y;
