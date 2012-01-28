@@ -254,6 +254,7 @@ public:
 	SoundSource *createSource(const std::string &sourcename,
 			const std::string &basename="");
 	SoundSource *getSource(const std::string &sourcename);
+	void destroySource(const std::string &sourcename);
 
 private:
 	Audio();

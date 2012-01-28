@@ -482,6 +482,22 @@ SoundSource *Audio::getSource(const std::string &sourcename)
 	return createSource(sourcename);
 }
 
+void
+Audio::destroySource(const std::string &sourcename)
+{
+	SoundSourceMap::iterator present = m_sound_slot.find(sourcename);
+
+	if (present == m_sound_slot.end()) {
+		dstream << "WARNING: attempt to destroy non-existant source "
+			<< sourcename << std::endl;
+		return;
+	}
+
+	SoundSource *src = present->second;
+	m_sound_slot.erase(present);
+	delete src;
+}
+
 void Audio::updateListener(const scene::ICameraSceneNode* cam, const v3f &vel)
 {
 	_CHECK_AVAIL;
