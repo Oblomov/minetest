@@ -199,7 +199,6 @@ class AmbientSound : public SoundSource
 public:
 	AmbientSound(SoundBuffer *buf=NULL) : SoundSource(buf)
 	{
-		_SOURCE_CHECK;
 		loop();
 		setRelative();
 	}
@@ -213,7 +212,6 @@ class PlayerSound : public SoundSource
 public:
 	PlayerSound(SoundBuffer *buf=NULL) : SoundSource(buf)
 	{
-		_SOURCE_CHECK;
 		setRelative();
 	}
 };
