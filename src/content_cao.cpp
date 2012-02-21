@@ -501,6 +501,7 @@ void TestCAO::updateNodePos()
 
 	m_node->setPosition(m_position);
 	//m_node->setRotation(v3f(0, 45, 0));
+	setSoundPosition(m_position);
 }
 
 void TestCAO::step(float dtime, ClientEnvironment *env)
@@ -637,6 +638,7 @@ void ItemCAO::updateNodePos()
 		return;
 
 	m_node->setPosition(m_position);
+	setSoundPosition(m_position);
 }
 
 void ItemCAO::updateInfoText()
@@ -839,6 +841,7 @@ void RatCAO::updateNodePos()
 
 	//m_node->setPosition(m_position);
 	m_node->setPosition(pos_translator.vect_show);
+	setSoundPosition(pos_translator.vect_show);
 
 	v3f rot = m_node->getRotation();
 	rot.Y = 180.0 - m_yaw;
@@ -995,6 +998,7 @@ void Oerkki1CAO::updateNodePos()
 
 	//m_node->setPosition(m_position);
 	m_node->setPosition(pos_translator.vect_show);
+	setSoundPosition(pos_translator.vect_show);
 
 	v3f rot = m_node->getRotation();
 	rot.Y = 180.0 - m_yaw + 90.0;
@@ -1226,6 +1230,7 @@ void FireflyCAO::updateNodePos()
 
 	//m_node->setPosition(m_position);
 	m_node->setPosition(pos_translator.vect_show);
+	setSoundPosition(pos_translator.vect_show);
 
 	v3f rot = m_node->getRotation();
 	rot.Y = 180.0 - m_yaw;
@@ -1405,6 +1410,7 @@ void MobV2CAO::updateNodePos()
 		return;
 
 	m_node->setPosition(pos_translator.vect_show + v3f(0,m_sprite_y,0));
+	setSoundPosition(pos_translator.vect_show + v3f(0,m_sprite_y,0));
 }
 
 void MobV2CAO::step(float dtime, ClientEnvironment *env)
@@ -1865,6 +1871,7 @@ public:
 		if(m_spritenode){
 			m_spritenode->setPosition(pos_translator.vect_show);
 		}
+		setSoundPosition(pos_translator.vect_show);
 	}
 
 	void step(float dtime, ClientEnvironment *env)

@@ -37,6 +37,14 @@ ClientActiveObject::ClientActiveObject(u16 id, IGameDef *gamedef,
 ClientActiveObject::~ClientActiveObject()
 {
 	removeFromScene();
+#if USE_AUDIO
+	Audio::SoundSourceMap::iterator snd=m_sound.begin();
+	while (snd != m_sound.end()) {
+		delete snd->second;
+		++snd;
+	}
+
+#endif
 }
 
 ClientActiveObject* ClientActiveObject::create(u8 type, IGameDef *gamedef,
@@ -55,6 +63,8 @@ ClientActiveObject* ClientActiveObject::create(u8 type, IGameDef *gamedef,
 
 	Factory f = n->getValue();
 	ClientActiveObject *object = (*f)(gamedef, env);
+	// DEBUG
+	// object->setSound("move", "cao_move");
 	return object;
 }
 
@@ -67,4 +77,29 @@ void ClientActiveObject::registerType(u16 type, Factory f)
 	m_types.insert(type, f);
 }
 
+void ClientActiveObject::setSound(const std::string &slotname,
+			const std::string &basename)
+{
+#if USE_AUDIO
+	SoundSource *slot;
+	m_sound[slotname] = slot = new SoundSource(NULL);
+	slot->replace(Audio::sound(basename));
+	slot->mapTo(slotname);
+#endif
+}
+
+void ClientActiveObject::setSoundPosition(const v3f &pos)
+{
+#if USE_AUDIO
+	Audio::SoundSourceMap::iterator snd=m_sound.begin();
+	while (snd != m_sound.end()) {
+		snd->second->setPosition(pos);
+		if (snd->first.compare("move") == 0) {
+			// dstream << "Playing move sound" << std::endl;
+			snd->second->shouldPlay(true);
+		}
+		++snd;
+	}
+#endif
+}
 

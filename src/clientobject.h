@@ -23,6 +23,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "common_irrlicht.h"
 #include "activeobject.h"
 
+#include "config.h"
+
+#if USE_AUDIO
+#include "audio.h"
+#endif
+
 /*
 
 Some planning
@@ -78,12 +84,21 @@ public:
 	virtual bool directReportPunch(const std::string &toolname, v3f dir)
 	{ return false; }
 
+	// assign the given basename sound(s) to the sound slot slotname
+	virtual void setSound(const std::string &slotname,
+			const std::string &basename);
+	// update the position of all object sounds
+	virtual void setSoundPosition(const v3f &pos);
+
 protected:
 	// Used for creating objects based on type
 	typedef ClientActiveObject* (*Factory)(IGameDef *gamedef, ClientEnvironment *env);
 	static void registerType(u16 type, Factory f);
 	IGameDef *m_gamedef;
 	ClientEnvironment *m_env;
+#if USE_AUDIO
+	Audio::SoundSourceMap m_sound;
+#endif
 private:
 	// Used for creating objects based on type
 	static core::map<u16, Factory> m_types;

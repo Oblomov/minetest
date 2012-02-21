@@ -385,6 +385,10 @@ const SoundSource *Audio::getSoundSource(const std::string &basename)
 		dstream << "Sound '" << basename << "' not available"
 			<< std::endl;
 		snd = new SoundSource(NULL);
+		if (m_path.empty()) {
+			dstream << "Path not available, try again later" << std::endl;
+			return snd;
+		}
 	}
 	m_sound_source[basename] = snd;
 	return snd;

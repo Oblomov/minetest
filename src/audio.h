@@ -90,7 +90,7 @@ class SoundSource
 public:
 	/* create sound source attached to sound buffer */
 	SoundSource(const SoundBuffer *buf);
-	~SoundSource();
+	virtual ~SoundSource();
 
 	virtual void addAlternative(const SoundBuffer *buf);
 	virtual size_t countAlternatives() const {
@@ -223,6 +223,10 @@ class Audio
 	/* static interface */
 public:
 	static Audio *system();
+	static const SoundSource *sound(const std::string &basename)
+	{
+		return Audio::system()->getSoundSource(basename);
+	}
 private:
 	static Audio *m_system;
 
@@ -254,6 +258,7 @@ public:
 	SoundSource *getSource(const std::string &sourcename);
 	void destroySource(const std::string &sourcename);
 
+	typedef std::map<std::string, SoundSource *> SoundSourceMap;
 private:
 	Audio();
 	~Audio();
@@ -272,7 +277,6 @@ private:
 	typedef std::map<std::string, const SoundSource *> SoundSourceCache;
 	typedef std::map<std::string, AmbientSound *> AmbientSoundMap;
 	typedef std::map<std::string, PlayerSound *> PlayerSoundMap;
-	typedef std::map<std::string, SoundSource *> SoundSourceMap;
 
 	// sound source cache
 	SoundSourceCache m_sound_source;
