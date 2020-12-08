@@ -1487,8 +1487,10 @@ For helper functions see [Spatial Vectors].
 * `{type="nothing"}`
 * `{type="node", under=pos, above=pos}`
     * Indicates a pointed node selection box.
-    * `under` refers to the node position behind the pointed face.
-    * `above` refers to the node position in front of the pointed face.
+    * `under` refers to the node position behind the pointed face
+      (i.e. the position that would be dug).
+    * `above` refers to the node position in front of the pointed face
+      (i.e. the position that would be occupied by a placemenet).
 * `{type="object", ref=ObjectRef}`
 
 Exact pointing location (currently only `Raycast` supports these fields):
